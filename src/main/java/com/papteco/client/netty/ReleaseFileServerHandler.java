@@ -18,51 +18,56 @@ package com.papteco.client.netty;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.papteco.client.action.FileActionUtils;
 import com.papteco.client.ui.EnvConstant;
 import com.papteco.web.beans.ClientRequestBean;
+import com.papteco.web.beans.QueueItem;
 
 /**
  * Handles both client-side and server-side handler depending on which
  * constructor was called.
  */
-public class ReceiveFileFromServerHandler extends ChannelInboundHandlerAdapter {
+public class ReleaseFileServerHandler extends ChannelInboundHandlerAdapter {
 
     private static final Logger logger = Logger.getLogger(
-            ReceiveFileFromServerHandler.class.getName());
+            ReleaseFileServerHandler.class.getName());
 
     @Override
     public void channelRead(
             ChannelHandlerContext ctx, Object msg) throws Exception {
-        // Echo back the received object to the client.
     	ClientRequestBean bean = (ClientRequestBean) msg;
-		if (bean.getPrjObj() != null) {
-			File file = new File(EnvConstant.LCL_STORING_PATH, bean.getqItem().getParam());
-			this.prepareFolderPath(file.getPath());
-			System.out.println("Writing local file: " + file.getPath());
-			if (!file.exists()) {
-				System.out.println("File not existing: " + file.getPath());
-			}
-			byte[] buffer = (byte[]) bean.getPrjObj();
-			BufferedOutputStream buff = null;
-			buff = new BufferedOutputStream(new FileOutputStream(file));
-			buff.write(buffer);
-			buff.flush();
-			buff.close();
-		} else {
-			System.out.println("Cannot find the specific file.");
-		}
-		ctx.close();
+    	switch (bean.getActionType())
+    	{
+    	case 'R':
+    		if (bean.getqItem() != null) {
+    			File file = new File(EnvConstant.LCL_STORING_PATH, bean.getqItem().getParam());
+    			if(file.exists()){
+        			InputStream fis = new BufferedInputStream(new FileInputStream(file));
+        			byte[] buffer = new byte[fis.available()];
+        	        fis.read(buffer);
+        	        fis.close();
+        	        bean.setPrjObj(buffer);
+        		}
+    		} else {
+    			System.out.println("Cannot find the specific file.");
+    		}
+    		break;
+    	}
+    	ctx.writeAndFlush(bean);
     }
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        ctx.flush();
+//        ctx.flush();
     }
 
     @Override
@@ -73,15 +78,4 @@ public class ReceiveFileFromServerHandler extends ChannelInboundHandlerAdapter {
                 "Unexpected exception from downstream.", cause);
         ctx.close();
     }
-    
-    protected void prepareFolderPath(String filepath) {
-		File file = new File(filepath);
-		File folder = new File(file.getParent());
-		if (!folder.exists()) {
-			folder.mkdirs();
-			folder.setExecutable(true, false);
-			folder.setReadable(true, false);
-			folder.setWritable(true, false);
-		}
-	}
 }

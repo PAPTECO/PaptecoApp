@@ -18,12 +18,15 @@ package com.papteco.client.netty;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.papteco.client.action.FileActionUtils;
 import com.papteco.client.ui.EnvConstant;
+import com.papteco.web.beans.ClientRequestBean;
 import com.papteco.web.beans.QueueItem;
 
 /**
@@ -38,20 +41,43 @@ public class OpenFileServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(
             ChannelHandlerContext ctx, Object msg) throws Exception {
-        // Echo back the received object to the client.
-    	QueueItem qItem = (QueueItem) msg;
-    	System.out.println(qItem.getActionType()+":"+qItem.getParam());
-    	File file = new File(EnvConstant.LCL_STORING_PATH,qItem.getParam());
-    	if(file.exists()){
-    		FileActionUtils.openFile(file.getPath());
+    	ClientRequestBean bean = (ClientRequestBean) msg;
+    	switch (bean.getActionType())
+    	{
+    	case 'P':
+    		if (bean.getPrjObj() != null) {
+    			File file = new File(EnvConstant.LCL_STORING_PATH, bean.getqItem().getParam());
+    			this.prepareFolderPath(file.getPath());
+    			System.out.println("Writing local file: " + file.getPath());
+    			if (!file.exists()) {
+    				file.createNewFile();
+    			}
+    			byte[] buffer = (byte[]) bean.getPrjObj();
+    			BufferedOutputStream buff = null;
+    			buff = new BufferedOutputStream(new FileOutputStream(file));
+    			buff.write(buffer);
+    			buff.flush();
+    			buff.close();
+    		} else {
+    			System.out.println("Cannot find the specific file.");
+    		}
+    		break;
+    	case 'O':
+    		QueueItem qItem = bean.getqItem();
+        	System.out.println(qItem.getActionType()+":"+qItem.getParam());
+        	File file = new File(EnvConstant.LCL_STORING_PATH,qItem.getParam());
+        	if(file.exists()){
+        		FileActionUtils.openFile(file.getPath());
+        	}
+        	ctx.close();
+    		break;
     	}
-    	ctx.close();
-//        ctx.write(qItem);
+    	ctx.writeAndFlush("FEEDBACK");
     }
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        ctx.flush();
+//        ctx.flush();
     }
 
     @Override
@@ -62,4 +88,15 @@ public class OpenFileServerHandler extends ChannelInboundHandlerAdapter {
                 "Unexpected exception from downstream.", cause);
         ctx.close();
     }
+    
+    protected void prepareFolderPath(String filepath) {
+		File file = new File(filepath);
+		File folder = new File(file.getParent());
+		if (!folder.exists()) {
+			folder.mkdirs();
+			folder.setExecutable(true, false);
+			folder.setReadable(true, false);
+			folder.setWritable(true, false);
+		}
+	}
 }

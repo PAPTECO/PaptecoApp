@@ -28,11 +28,11 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 /**
  * Modification of {@link EchoServer} which utilizes Java object serialization.
  */
-public class ReceiveFileFromServerBuilder implements Runnable{
+public class ReleaseFileServerBuilder implements Runnable{
 
     private final int port;
 
-    public ReceiveFileFromServerBuilder(int port) {
+    public ReleaseFileServerBuilder(int port) {
         this.port = port;
     }
 
@@ -49,7 +49,7 @@ public class ReceiveFileFromServerBuilder implements Runnable{
                     ch.pipeline().addLast(
                             new ObjectEncoder(),
                             new ObjectDecoder(ClassResolvers.cacheDisabled(null)),
-                            new ReceiveFileFromServerHandler());
+                            new ReleaseFileServerHandler());
                 }
              });
 
@@ -71,6 +71,6 @@ public class ReceiveFileFromServerBuilder implements Runnable{
         } else {
             port = 8080;
         }
-        new ReceiveFileFromServerBuilder(port).run();
+        new ReleaseFileServerBuilder(port).run();
     }
 }

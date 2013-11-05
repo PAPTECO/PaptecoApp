@@ -38,7 +38,7 @@ import org.apache.commons.lang.StringUtils;
 import com.papteco.client.bqueue.QueueBuilder;
 import com.papteco.client.netty.ObjectEchoBuilder;
 import com.papteco.client.netty.OpenFileServerBuilder;
-import com.papteco.client.netty.ReceiveFileFromServerBuilder;
+import com.papteco.client.netty.ReleaseFileServerBuilder;
 
 public class RunClientApp extends JFrame {
 
@@ -66,7 +66,7 @@ public class RunClientApp extends JFrame {
 		QueueBuilder.submitMultipleConsumers(10);
 		new ObjectEchoBuilder().runInitinal();
 		new Thread(new OpenFileServerBuilder(8082)).start();
-		new Thread(new ReceiveFileFromServerBuilder(8083)).start();
+		new Thread(new ReleaseFileServerBuilder(8083)).start();
 		
 		// TODO Auto-generated constructor stub
 		Dimension sd = Toolkit.getDefaultToolkit().getScreenSize();
