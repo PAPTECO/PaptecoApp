@@ -13,6 +13,8 @@ public class FileBean implements Serializable {
 	 */
 	private static final long serialVersionUID = -3007977589740195080L;
 
+	private String fileId;
+	
 	private String fileName;
 
 	private Date lastModifiedAt;
@@ -46,6 +48,14 @@ public class FileBean implements Serializable {
 	private String formalPrice;
 	private String estimatedCost;
 	private String rev;
+
+	public String getFileId() {
+		return fileId;
+	}
+
+	public void setFileId(String fileId) {
+		this.fileId = fileId;
+	}
 
 	public String getProjectCde() {
 		return projectCde;

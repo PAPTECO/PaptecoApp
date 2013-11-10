@@ -67,7 +67,7 @@ public class ObjectEchoBuilder {
 		}
 	}
 	
-	public void runSelProjectEcho() throws Exception {
+	public void runSelProjectEcho() throws InterruptedException {
 		EventLoopGroup group = new NioEventLoopGroup();
 		try {
 			Bootstrap b = new Bootstrap();

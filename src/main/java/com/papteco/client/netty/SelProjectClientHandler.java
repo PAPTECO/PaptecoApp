@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.papteco.client.action.JPromptWindow;
 import com.papteco.client.bqueue.QueueBuilder;
 import com.papteco.client.ui.EnvConstant;
 import com.papteco.web.beans.ClientRequestBean;
@@ -40,7 +41,6 @@ public class SelProjectClientHandler extends ChannelInboundHandlerAdapter {
 	private ClientRequestBean req = new ClientRequestBean(
 			NettyConstant.SEL_PROJECT_ACTION_TYPE);
 	private String prjCde;
-
 	/**
 	 * Creates a client-side handler.
 	 */
@@ -71,7 +71,7 @@ public class SelProjectClientHandler extends ChannelInboundHandlerAdapter {
 			this.prepareLocalFolders(prj);
 			this.submitFileJobsToQueue(prj);
 		} else {
-			System.out.println("Cannot find the specific project.");
+			JPromptWindow.showWarnMsg("Cannot find the specific project.");
 		}
 		ctx.close();
 	}

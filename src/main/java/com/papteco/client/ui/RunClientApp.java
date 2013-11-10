@@ -11,8 +11,6 @@ import java.awt.Toolkit;
 import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -26,6 +24,7 @@ import java.nio.channels.FileLock;
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -35,6 +34,8 @@ import javax.swing.SwingConstants;
 
 import org.apache.commons.lang.StringUtils;
 
+import com.papteco.client.action.JPromptWindow;
+import com.papteco.client.action.PathCacheUtils;
 import com.papteco.client.bqueue.QueueBuilder;
 import com.papteco.client.netty.ObjectEchoBuilder;
 import com.papteco.client.netty.OpenFileServerBuilder;
@@ -58,162 +59,193 @@ public class RunClientApp extends JFrame {
 	private JLabel lclPath_l;
 	private JTextField lclPath;
 	private JCheckBox lclPath_chk;
+	private JButton lclPath_btn;
+	private JFileChooser fw;
 	private JLabel prjCde_l;
 	private JTextField prjCde;
 	private JButton submitBtn;
 
 	public RunClientApp() throws Exception {
-		QueueBuilder.submitMultipleConsumers(10);
-		new ObjectEchoBuilder().runInitinal();
-		new Thread(new OpenFileServerBuilder(8082)).start();
-		new Thread(new ReleaseFileServerBuilder(8083)).start();
-		
-		// TODO Auto-generated constructor stub
-		Dimension sd = Toolkit.getDefaultToolkit().getScreenSize();
-		Insets si = Toolkit.getDefaultToolkit().getScreenInsets(
-				this.getGraphicsConfiguration());
-		pointX = sd.width - winWidth - 3;
-		pointY = sd.height - si.bottom - winHeight - 3;
+		try {
+			QueueBuilder.submitMultipleConsumers(10);
+			new ObjectEchoBuilder().runInitinal();
+			new Thread(new OpenFileServerBuilder(8082)).start();
+			new Thread(new ReleaseFileServerBuilder(8083)).start();
 
-		JPanel panel = new JPanel(new GridLayout(5, 1));
-		panel.setBounds(0, 0, 100, 50);
-		;
-		lclPath_l = new JLabel("Path of Project Folder:");
-		JPanel lclpanel = new JPanel(new GridLayout(1, 2));
-		lclPath = new JTextField(40);
-		lclPath.setText("C:/cony/projes");
-		lclPath_chk = new JCheckBox("Ensure");
-		lclpanel.add(lclPath);
-		lclPath.setBounds(0, 0, 300, 20);
-		lclpanel.add(lclPath_chk);
-		prjCde_l = new JLabel("Please Input Project Code:");
-		prjCde = new JTextField(15);
-		submitBtn = new JButton("Submit");
-		panel.add(lclPath_l);
-		panel.add(lclpanel);
-		panel.add(prjCde_l);
-		panel.add(prjCde);
-		panel.add(submitBtn);
+			JPromptWindow.frame = frame;
+			// TODO Auto-generated constructor stub
+			Dimension sd = Toolkit.getDefaultToolkit().getScreenSize();
+			Insets si = Toolkit.getDefaultToolkit().getScreenInsets(
+					this.getGraphicsConfiguration());
+			pointX = sd.width - winWidth - 3;
+			pointY = sd.height - si.bottom - winHeight - 3;
 
-		lclPath_chk.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent e) {
-				if (lclPath_chk.isSelected()) {
-					if (StringUtils.isNotEmpty(lclPath.getText())) {
+			JPanel panel = new JPanel(new GridLayout(5, 1));
+			panel.setBounds(0, 0, 100, 50);
+			;
+			lclPath_l = new JLabel("Path of Project Folder:");
+			JPanel lclpanel = new JPanel(new GridLayout(1, 2));
+			lclPath = new JTextField(40);
+			lclPath.setEditable(false);
+			lclPath.setText(PathCacheUtils.readFile());
+			EnvConstant.LCL_STORING_PATH = lclPath.getText();
+			lclPath_chk = new JCheckBox("Ensure");
+			lclPath_btn = new JButton("Open");
+			lclPath_btn.setPreferredSize(new Dimension(100, 50));
+			lclPath_btn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					fw = new JFileChooser();
+					fw.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+					int intRetVal = fw.showOpenDialog(null);
+					if (intRetVal == JFileChooser.APPROVE_OPTION) {
+						lclPath.setText(fw.getSelectedFile().getPath());
 						EnvConstant.LCL_STORING_PATH = lclPath.getText();
-						File f = new File(EnvConstant.LCL_STORING_PATH);
-						if (!f.exists()) {
-							f.mkdirs();
-							f.setExecutable(true, false);
-							f.setReadable(true, false);
-							f.setWritable(true, false);
-							System.out.println("Folder \"" + f.getName()
-									+ "\" created!");
+						try {
+							PathCacheUtils.writeFile(lclPath.getText());
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}
+				}
+			});
+			lclpanel.add(lclPath);
+			lclPath.setBounds(0, 0, 300, 20);
+			// lclpanel.add(new JLabel());
+			lclpanel.add(lclPath_btn);
+			prjCde_l = new JLabel("Please Input Project Code:");
+			prjCde = new JTextField(15);
+			submitBtn = new JButton("Submit");
+			panel.add(lclPath_l);
+			panel.add(lclpanel);
+			panel.add(prjCde_l);
+			panel.add(prjCde);
+			panel.add(submitBtn);
+
+			/*
+			 * lclPath_chk.addItemListener(new ItemListener() { public void
+			 * itemStateChanged(ItemEvent e) { if (lclPath_chk.isSelected()) {
+			 * if (StringUtils.isNotEmpty(lclPath.getText())) {
+			 * EnvConstant.LCL_STORING_PATH = lclPath.getText(); File f = new
+			 * File(EnvConstant.LCL_STORING_PATH); if (!f.exists()) {
+			 * f.mkdirs(); f.setExecutable(true, false); f.setReadable(true,
+			 * false); f.setWritable(true, false);
+			 * System.out.println("Folder \"" + f.getName() + "\" created!"); }
+			 * else { System.out.println("Folder \"" + f.getName() +
+			 * "\" existing already!"); } lclPath.setEnabled(false); } else {
+			 * JOptionPane.showMessageDialog(frame,
+			 * "Project Storing Path cannot be empty!", "Warning",
+			 * JOptionPane.PLAIN_MESSAGE); } } else { lclPath.setEnabled(true);
+			 * } } });
+			 */
+
+			submitBtn.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					// TODO Auto-generated method stub
+					try {
+						if (StringUtils.isNotEmpty(lclPath.getText())
+								&& StringUtils.isNotEmpty(prjCde.getText()
+										.trim())) {
+							new Thread(new Runnable(){
+								public void run(){
+									try {
+										new ObjectEchoBuilder(prjCde.getText())
+										.runSelProjectEcho();
+									} catch (InterruptedException e) {
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+								}
+							}).start();
+							
 						} else {
-							System.out.println("Folder \"" + f.getName()
-									+ "\" existing already!");
+							JPromptWindow.showWarnMsg("Please input your project storing path and input a project code!");
 						}
-						lclPath.setEnabled(false);
-					} else {
-						JOptionPane.showMessageDialog(frame,
-								"Project Storing Path cannot be empty!",
-								"Warning", JOptionPane.PLAIN_MESSAGE);
-					}
-				} else {
-					lclPath.setEnabled(true);
-				}
-			}
-		});
 
-		submitBtn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-				try {
-					if (lclPath_chk.isSelected()
-							&& StringUtils.isNotEmpty(prjCde.getText().trim())) {
-						new ObjectEchoBuilder(prjCde.getText())
-								.runSelProjectEcho();
-					} else {
-						JOptionPane
-								.showMessageDialog(
-										frame,
-										"Please Ensure your project storing path and input a project code!",
-										"Warning", JOptionPane.PLAIN_MESSAGE);
-					}
-
-				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-		});
-
-		getContentPane().add(panel, SwingConstants.CENTER);
-
-		addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
-
-				// TODO Auto-generated method stub
-				if (SystemTray.isSupported()) {
-					SystemTray systemTray = SystemTray.getSystemTray();
-					if (trayIcon != null) {
-						systemTray.remove(trayIcon);
-						System.out.println("trayIcon removed");
-					}
-					URL resource = this.getClass().getResource("/icon.jpg");
-					BufferedImage imageScaled = null;
-					BufferedImage in;
-					try {
-						in = ImageIO.read(resource);
-						// imageScaled = ImageScale.scale(in, 0.05, 0.05, 1);
-						imageScaled = in;
-					} catch (IOException e1) {
+					} catch (Exception e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-
-					PopupMenu popupMenu = new PopupMenu();
-					MenuItem item = new MenuItem("exit");
-					MenuItem item2 = new MenuItem("open");
-					popupMenu.add(item);
-					popupMenu.add(item2);
-					item.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-							// TODO Auto-generated method stub
-							QueueBuilder.closeQueueService();
-							System.exit(0);
-						}
-					});
-
-					item2.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-							// TODO Auto-generated method stub
-							frame.setVisible(true);
-						}
-					});
-
-					trayIcon = new TrayIcon(imageScaled, "Papteco", popupMenu);
-					trayIcon.setImageAutoSize(true);
-
-					trayIcon.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-							// TODO Auto-generated method stub
-							frame.setVisible(true);
-						}
-					});
-
-					try {
-						systemTray.add(trayIcon);
-					} catch (AWTException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-					frame.setVisible(false);
-				} else {
-					JOptionPane.showMessageDialog(null, "系统不支持托盘功能", "Message",
-							JOptionPane.INFORMATION_MESSAGE);
 				}
-			}
-		});
+			});
+
+			getContentPane().add(panel, SwingConstants.CENTER);
+
+			addWindowListener(new WindowAdapter() {
+				public void windowClosing(WindowEvent e) {
+
+					// TODO Auto-generated method stub
+					if (SystemTray.isSupported()) {
+						SystemTray systemTray = SystemTray.getSystemTray();
+						if (trayIcon != null) {
+							systemTray.remove(trayIcon);
+							System.out.println("trayIcon removed");
+						}
+						URL resource = this.getClass().getResource("/icon.jpg");
+						BufferedImage imageScaled = null;
+						BufferedImage in;
+						try {
+							in = ImageIO.read(resource);
+							// imageScaled = ImageScale.scale(in, 0.05, 0.05,
+							// 1);
+							imageScaled = in;
+						} catch (IOException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+
+						PopupMenu popupMenu = new PopupMenu();
+						MenuItem item = new MenuItem("exit");
+						MenuItem item2 = new MenuItem("open");
+						popupMenu.add(item);
+						popupMenu.add(item2);
+						item.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
+								// TODO Auto-generated method stub
+								QueueBuilder.closeQueueService();
+								System.exit(0);
+							}
+						});
+
+						item2.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
+								// TODO Auto-generated method stub
+								frame.setVisible(true);
+							}
+						});
+
+						trayIcon = new TrayIcon(imageScaled, "Papteco",
+								popupMenu);
+						trayIcon.setImageAutoSize(true);
+
+						trayIcon.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent e) {
+								// TODO Auto-generated method stub
+								frame.setVisible(true);
+							}
+						});
+
+						try {
+							systemTray.add(trayIcon);
+						} catch (AWTException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						frame.setVisible(false);
+					} else {
+						JOptionPane.showMessageDialog(null, "系统不支持托盘功能",
+								"Message", JOptionPane.INFORMATION_MESSAGE);
+					}
+				}
+			});
+		} catch (Exception e2) {
+			// TODO Auto-generated catch block
+			JOptionPane.showMessageDialog(frame,
+					"Cannot connect to PIMS Server.", "Warning",
+					JOptionPane.PLAIN_MESSAGE);
+			QueueBuilder.closeQueueService();
+			System.exit(0);
+		}
 
 	}
 
@@ -250,7 +282,7 @@ public class RunClientApp extends JFrame {
 
 	/**
 	 * @param args
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
