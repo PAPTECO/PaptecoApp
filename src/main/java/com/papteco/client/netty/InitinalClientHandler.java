@@ -59,7 +59,6 @@ public class InitinalClientHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		// TODO Auto-generated method stub
-		System.out.println("Project Search Disconnected!");
 	}
 
 	@Override
@@ -67,7 +66,6 @@ public class InitinalClientHandler extends ChannelInboundHandlerAdapter {
 			throws Exception {
 		// Echo back the received object to the server.
 		ClientRequestBean bean = (ClientRequestBean) msg;
-		System.out.println(bean.getIpItem().getPCID()+bean.getIpItem().getPCIP()+":"+bean.getIpItem().getPCNAME());
 		ctx.close();
 	}
 

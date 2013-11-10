@@ -82,7 +82,7 @@ public class RunClientApp extends JFrame {
 
 			JPanel panel = new JPanel(new GridLayout(5, 1));
 			panel.setBounds(0, 0, 100, 50);
-			;
+			this.setAlwaysOnTop(true);
 			lclPath_l = new JLabel("Path of Project Folder:");
 			JPanel lclpanel = new JPanel(new GridLayout(1, 2));
 			lclPath = new JTextField(40);
@@ -113,7 +113,7 @@ public class RunClientApp extends JFrame {
 			lclPath.setBounds(0, 0, 300, 20);
 			// lclpanel.add(new JLabel());
 			lclpanel.add(lclPath_btn);
-			prjCde_l = new JLabel("Please Input Project Code:");
+			prjCde_l = new JLabel("Please Input Project Code(e.g. 1000-1301-001):");
 			prjCde = new JTextField(15);
 			submitBtn = new JButton("Submit");
 			panel.add(lclPath_l);
