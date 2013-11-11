@@ -90,7 +90,7 @@ public class RunClientApp extends JFrame {
 			lclPath.setText(PathCacheUtils.readFile());
 			EnvConstant.LCL_STORING_PATH = lclPath.getText();
 			lclPath_chk = new JCheckBox("Ensure");
-			lclPath_btn = new JButton("Open");
+			lclPath_btn = new JButton("Set Path");
 			lclPath_btn.setPreferredSize(new Dimension(100, 50));
 			lclPath_btn.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -195,8 +195,8 @@ public class RunClientApp extends JFrame {
 						}
 
 						PopupMenu popupMenu = new PopupMenu();
-						MenuItem item = new MenuItem("exit");
-						MenuItem item2 = new MenuItem("open");
+						MenuItem item = new MenuItem("Exit");
+						MenuItem item2 = new MenuItem("Open Window");
 						popupMenu.add(item);
 						popupMenu.add(item2);
 						item.addActionListener(new ActionListener() {
@@ -233,7 +233,7 @@ public class RunClientApp extends JFrame {
 						}
 						frame.setVisible(false);
 					} else {
-						JOptionPane.showMessageDialog(null, "系统不支持托盘功能",
+						JOptionPane.showMessageDialog(null, "Papteco",
 								"Message", JOptionPane.INFORMATION_MESSAGE);
 					}
 				}
@@ -255,7 +255,7 @@ public class RunClientApp extends JFrame {
 		FileLock lock = null;
 
 		try {
-			// 在临时文件夹创建一个临时文件，锁住这个文件用来保证应用程序只有一个实例被创建.
+			
 			File sf = new File(System.getProperty("java.io.tmpdir") + singleId
 					+ ".single");
 			sf.deleteOnExit();
@@ -266,8 +266,6 @@ public class RunClientApp extends JFrame {
 			lock = channel.tryLock();
 
 			if (lock == null) {
-				// 如果没有得到锁，则程序退出.
-				// 没有必要手动释放锁和关闭流，当程序退出时，他们会被关闭的.
 				// Error is for a automatically stop of the program, while
 				// for Exception, you have to handle it in the catch clause.
 				JOptionPane.showMessageDialog(null,
@@ -287,7 +285,7 @@ public class RunClientApp extends JFrame {
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
 
-		RunClientApp.makeSingle("single.test"); // 保证程序只有一个实例在运行.
+		RunClientApp.makeSingle("single.test"); 
 		frame = new RunClientApp();
 		frame.setTitle("Papteco Client Application");
 		frame.setVisible(true);
