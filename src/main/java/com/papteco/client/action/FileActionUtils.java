@@ -5,7 +5,13 @@ import java.io.IOException;
 public class FileActionUtils {
 	
 	public static void openFile(String file) throws IOException{
-		Runtime.getRuntime().exec("cmd /C Start \" \" \"" + file + "\""); 
+		System.out.println(System.getProperty("os.name"));
+		if(System.getProperty("os.name").startsWith("Mac")){
+			String[] str = {"/usr/bin/open",file};
+			Runtime.getRuntime().exec(str);
+		}else{
+			Runtime.getRuntime().exec("cmd /C Start \" \" \"" + file + "\""); 
+		}
 	}
 
 }
