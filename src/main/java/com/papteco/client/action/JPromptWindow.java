@@ -11,4 +11,9 @@ public class JPromptWindow {
 		JOptionPane.showMessageDialog(frame, msg, "Warning",
 				JOptionPane.PLAIN_MESSAGE);
 	}
+	
+	public static void showInfoMsg(String msg){
+		JOptionPane.showMessageDialog(frame, msg, "Information",
+				JOptionPane.PLAIN_MESSAGE);
+	}
 }
