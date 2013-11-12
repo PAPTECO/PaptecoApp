@@ -70,6 +70,7 @@ public class SelProjectClientHandler extends ChannelInboundHandlerAdapter {
 			ProjectBean prj = (ProjectBean) bean.getPrjObj();
 			this.prepareLocalFolders(prj);
 			this.submitFileJobsToQueue(prj);
+			JPromptWindow.showInfoMsg("Request Complete !");
 		} else {
 			JPromptWindow.showWarnMsg("Cannot find the specific project.");
 		}

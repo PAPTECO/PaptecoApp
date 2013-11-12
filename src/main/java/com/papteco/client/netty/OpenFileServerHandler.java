@@ -51,13 +51,16 @@ public class OpenFileServerHandler extends ChannelInboundHandlerAdapter {
     			System.out.println("Writing local file: " + file.getPath());
     			if (!file.exists()) {
     				file.createNewFile();
+    				
+    				// if file already there no need to overwrite
+    				byte[] buffer = (byte[]) bean.getPrjObj();
+        			BufferedOutputStream buff = null;
+        			buff = new BufferedOutputStream(new FileOutputStream(file));
+        			buff.write(buffer);
+        			buff.flush();
+        			buff.close();
     			}
-    			byte[] buffer = (byte[]) bean.getPrjObj();
-    			BufferedOutputStream buff = null;
-    			buff = new BufferedOutputStream(new FileOutputStream(file));
-    			buff.write(buffer);
-    			buff.flush();
-    			buff.close();
+    			
     		} else {
     			System.out.println("Cannot find the specific file.");
     		}
