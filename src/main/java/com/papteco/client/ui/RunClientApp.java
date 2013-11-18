@@ -146,10 +146,11 @@ public class RunClientApp extends JFrame {
 						if (StringUtils.isNotEmpty(lclPath.getText())
 								&& StringUtils.isNotEmpty(prjCde.getText()
 										.trim())) {
+							prjCde.setText(prjCde.getText().trim());
 							new Thread(new Runnable(){
 								public void run(){
 									try {
-										new ObjectEchoBuilder(prjCde.getText())
+										new ObjectEchoBuilder(prjCde.getText().trim())
 										.runSelProjectEcho();
 									} catch (InterruptedException e) {
 										// TODO Auto-generated catch block
