@@ -1,6 +1,7 @@
 package com.papteco.client.ui;
 
 import java.awt.AWTException;
+import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Insets;
@@ -23,12 +24,12 @@ import java.nio.channels.FileLock;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
@@ -37,6 +38,7 @@ import org.apache.commons.lang.StringUtils;
 import com.papteco.client.action.JPromptWindow;
 import com.papteco.client.action.PathCacheUtils;
 import com.papteco.client.bqueue.QueueBuilder;
+import com.papteco.client.netty.LoginClientBuilder;
 import com.papteco.client.netty.ObjectEchoBuilder;
 import com.papteco.client.netty.OpenFileServerBuilder;
 import com.papteco.client.netty.ReleaseFileServerBuilder;
@@ -58,187 +60,213 @@ public class RunClientApp extends JFrame {
 	private static int pointY;
 	private JLabel lclPath_l;
 	private JTextField lclPath;
-	private JCheckBox lclPath_chk;
 	private JButton lclPath_btn;
 	private JFileChooser fw;
 	private JLabel prjCde_l;
 	private JTextField prjCde;
 	private JButton submitBtn;
+	private JTextField username;
+	private JPasswordField password;
+	private JPanel loginpanel;
+	private JPanel mainpanel;
+	private JPanel basicpanel;
+	private CardLayout card;
 
 	public RunClientApp() throws Exception {
-		try {
-			QueueBuilder.submitMultipleConsumers(10);
-			new ObjectEchoBuilder().runInitinal();
-			new Thread(new OpenFileServerBuilder(8082)).start();
-			new Thread(new ReleaseFileServerBuilder(8083)).start();
-
-			JPromptWindow.frame = frame;
-			// TODO Auto-generated constructor stub
-			Dimension sd = Toolkit.getDefaultToolkit().getScreenSize();
-			Insets si = Toolkit.getDefaultToolkit().getScreenInsets(
-					this.getGraphicsConfiguration());
-			pointX = sd.width - winWidth - 3;
-			pointY = sd.height - si.bottom - winHeight - 3;
-
-			JPanel panel = new JPanel(new GridLayout(5, 1));
-			panel.setBounds(0, 0, 100, 50);
-			this.setAlwaysOnTop(true);
-			lclPath_l = new JLabel("Path of Project Folder:");
-			JPanel lclpanel = new JPanel(new GridLayout(1, 2));
-			lclPath = new JTextField(40);
-			lclPath.setEditable(false);
-			lclPath.setText(PathCacheUtils.readFile());
-			EnvConstant.LCL_STORING_PATH = lclPath.getText();
-			lclPath_chk = new JCheckBox("Ensure");
-			lclPath_btn = new JButton("Set Path");
-			lclPath_btn.setPreferredSize(new Dimension(100, 50));
-			lclPath_btn.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					fw = new JFileChooser();
-					fw.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-					int intRetVal = fw.showOpenDialog(null);
-					if (intRetVal == JFileChooser.APPROVE_OPTION) {
-						lclPath.setText(fw.getSelectedFile().getPath());
-						EnvConstant.LCL_STORING_PATH = lclPath.getText();
-						try {
-							PathCacheUtils.writeFile(lclPath.getText());
-						} catch (IOException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-					}
-				}
-			});
-			lclpanel.add(lclPath);
-			lclPath.setBounds(0, 0, 300, 20);
-			// lclpanel.add(new JLabel());
-			lclpanel.add(lclPath_btn);
-			prjCde_l = new JLabel("Please Input Project Code(e.g. 1000-1301-001):");
-			prjCde = new JTextField(15);
-			submitBtn = new JButton("Submit");
-			panel.add(lclPath_l);
-			panel.add(lclpanel);
-			panel.add(prjCde_l);
-			panel.add(prjCde);
-			panel.add(submitBtn);
-
-			/*
-			 * lclPath_chk.addItemListener(new ItemListener() { public void
-			 * itemStateChanged(ItemEvent e) { if (lclPath_chk.isSelected()) {
-			 * if (StringUtils.isNotEmpty(lclPath.getText())) {
-			 * EnvConstant.LCL_STORING_PATH = lclPath.getText(); File f = new
-			 * File(EnvConstant.LCL_STORING_PATH); if (!f.exists()) {
-			 * f.mkdirs(); f.setExecutable(true, false); f.setReadable(true,
-			 * false); f.setWritable(true, false);
-			 * System.out.println("Folder \"" + f.getName() + "\" created!"); }
-			 * else { System.out.println("Folder \"" + f.getName() +
-			 * "\" existing already!"); } lclPath.setEnabled(false); } else {
-			 * JOptionPane.showMessageDialog(frame,
-			 * "Project Storing Path cannot be empty!", "Warning",
-			 * JOptionPane.PLAIN_MESSAGE); } } else { lclPath.setEnabled(true);
-			 * } } });
-			 */
-
-			submitBtn.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					// TODO Auto-generated method stub
+		card = new CardLayout(5, 5);
+		basicpanel = new JPanel(card);
+		this.setAlwaysOnTop(true);
+		Dimension sd = Toolkit.getDefaultToolkit().getScreenSize();
+		Insets si = Toolkit.getDefaultToolkit().getScreenInsets(
+				this.getGraphicsConfiguration());
+		pointX = sd.width - winWidth - 3;
+		pointY = sd.height - si.bottom - winHeight - 3;
+		
+		//==========login panel=============
+		loginpanel = new JPanel(new GridLayout(5, 1));
+		loginpanel.setBounds(0, 0, 100, 50);
+		username = new JTextField(40);
+		password = new JPasswordField(40);
+		JButton submit_btn = new JButton("Submit");
+		loginpanel.add(new JLabel("Username: "));
+		loginpanel.add(username);
+		loginpanel.add(new JLabel("Password: "));
+		loginpanel.add(password);
+		loginpanel.add(submit_btn);
+		submit_btn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				if(StringUtils.isEmpty(username.getText())){
+					JPromptWindow.showWarnMsg("Please input username!");
+				}else if(StringUtils.isEmpty(String.valueOf(password.getPassword()))){
+					JPromptWindow.showWarnMsg("Please input password!");
+				}else{
 					try {
-						if (StringUtils.isNotEmpty(lclPath.getText())
-								&& StringUtils.isNotEmpty(prjCde.getText()
-										.trim())) {
-							prjCde.setText(prjCde.getText().trim());
-							new Thread(new Runnable(){
-								public void run(){
-									try {
-										new ObjectEchoBuilder(prjCde.getText().trim())
-										.runSelProjectEcho();
-									} catch (InterruptedException e) {
-										// TODO Auto-generated catch block
-										e.printStackTrace();
-									}
-								}
-							}).start();
-							
-						} else {
-							JPromptWindow.showWarnMsg("Please input your project storing path and input a project code!");
+						LoginStatusUtil.loginStatus = "";
+						new LoginClientBuilder(username.getText(), String.valueOf(password.getPassword())).validateUser();
+						System.out.println(LoginStatusUtil.loginStatus);
+						if(LoginStatusUtil.loginStatus.equals("NOUSER")){
+							JPromptWindow.showWarnMsg("No this user!");
+						}else if(LoginStatusUtil.loginStatus.equals("PWDINC")){
+							JPromptWindow.showWarnMsg("Incorrect password!");
+						}else{
+							showMainPanel(username.getText());
+							card.show(basicpanel, "mainpanel");
 						}
-
 					} catch (Exception e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 				}
-			});
-
-			getContentPane().add(panel, SwingConstants.CENTER);
-
-			addWindowListener(new WindowAdapter() {
-				public void windowClosing(WindowEvent e) {
-
-					// TODO Auto-generated method stub
-					if (SystemTray.isSupported()) {
-						SystemTray systemTray = SystemTray.getSystemTray();
-						if (trayIcon != null) {
-							systemTray.remove(trayIcon);
-							System.out.println("trayIcon removed");
-						}
-						URL resource = this.getClass().getResource("/icon.jpg");
-						BufferedImage imageScaled = null;
-						BufferedImage in;
-						try {
-							in = ImageIO.read(resource);
-							// imageScaled = ImageScale.scale(in, 0.05, 0.05,
-							// 1);
-							imageScaled = in;
-						} catch (IOException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-
-						PopupMenu popupMenu = new PopupMenu();
-						MenuItem item = new MenuItem("Exit");
-						MenuItem item2 = new MenuItem("Open Window");
-						popupMenu.add(item);
-						popupMenu.add(item2);
-						item.addActionListener(new ActionListener() {
-							public void actionPerformed(ActionEvent e) {
-								// TODO Auto-generated method stub
-								QueueBuilder.closeQueueService();
-								System.exit(0);
-							}
-						});
-
-						item2.addActionListener(new ActionListener() {
-							public void actionPerformed(ActionEvent e) {
-								// TODO Auto-generated method stub
-								frame.setVisible(true);
-							}
-						});
-
-						trayIcon = new TrayIcon(imageScaled, "Papteco",
-								popupMenu);
-						trayIcon.setImageAutoSize(true);
-
-						trayIcon.addActionListener(new ActionListener() {
-							public void actionPerformed(ActionEvent e) {
-								// TODO Auto-generated method stub
-								frame.setVisible(true);
-							}
-						});
-
-						try {
-							systemTray.add(trayIcon);
-						} catch (AWTException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-						frame.setVisible(false);
-					} else {
-						JOptionPane.showMessageDialog(null, "Papteco",
-								"Message", JOptionPane.INFORMATION_MESSAGE);
+			}
+		});
+		basicpanel.add(loginpanel, "loginpanel");
+		
+		//===============main panel=================
+		JPromptWindow.frame = frame;
+		mainpanel = new JPanel(new GridLayout(5, 1));
+		mainpanel.setBounds(0, 0, 100, 50);
+		lclPath_l = new JLabel("Path of Project Folder:");
+		JPanel lclpanel = new JPanel(new GridLayout(1, 2));
+		lclPath = new JTextField(40);
+		lclPath.setEditable(false);
+		lclPath.setText(PathCacheUtils.readFile());
+		EnvConstant.LCL_STORING_PATH = lclPath.getText();
+		lclPath_btn = new JButton("Set Path");
+		lclPath_btn.setPreferredSize(new Dimension(100, 50));
+		lclPath_btn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				fw = new JFileChooser();
+				fw.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				int intRetVal = fw.showOpenDialog(null);
+				if (intRetVal == JFileChooser.APPROVE_OPTION) {
+					lclPath.setText(fw.getSelectedFile().getPath());
+					EnvConstant.LCL_STORING_PATH = lclPath.getText();
+					try {
+						PathCacheUtils.writeFile(lclPath.getText());
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
 					}
 				}
-			});
+			}
+		});
+		lclpanel.add(lclPath);
+		lclPath.setBounds(0, 0, 300, 20);
+		lclpanel.add(lclPath_btn);
+		prjCde_l = new JLabel("Please Input Project Code(e.g. 1000-1301-001):");
+		prjCde = new JTextField(15);
+		submitBtn = new JButton("Submit");
+		mainpanel.add(lclPath_l);
+		mainpanel.add(lclpanel);
+		mainpanel.add(prjCde_l);
+		mainpanel.add(prjCde);
+		mainpanel.add(submitBtn);
+		submitBtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				try {
+					if (StringUtils.isNotEmpty(lclPath.getText())
+							&& StringUtils.isNotEmpty(prjCde.getText()
+									.trim())) {
+						prjCde.setText(prjCde.getText().trim());
+						new Thread(new Runnable(){
+							public void run(){
+								try {
+									new ObjectEchoBuilder(prjCde.getText().trim())
+									.runSelProjectEcho();
+								} catch (InterruptedException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							}
+						}).start();
+						
+					} else {
+						JPromptWindow.showWarnMsg("Please input your project storing path and input a project code!");
+					}
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
+		basicpanel.add(mainpanel, "mainpanel");
+		
+		// ===========system tray===============
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent e) {
+
+				// TODO Auto-generated method stub
+				if (SystemTray.isSupported()) {
+					SystemTray systemTray = SystemTray.getSystemTray();
+					if (trayIcon != null) {
+						systemTray.remove(trayIcon);
+						System.out.println("trayIcon removed");
+					}
+					URL resource = this.getClass().getResource("/icon.jpg");
+					BufferedImage imageScaled = null;
+					BufferedImage in;
+					try {
+						in = ImageIO.read(resource);
+						// imageScaled = ImageScale.scale(in, 0.05, 0.05,
+						// 1);
+						imageScaled = in;
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					PopupMenu popupMenu = new PopupMenu();
+					MenuItem item = new MenuItem("Exit");
+					MenuItem item2 = new MenuItem("Open Window");
+					popupMenu.add(item);
+					popupMenu.add(item2);
+					item.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							// TODO Auto-generated method stub
+							QueueBuilder.closeQueueService();
+							System.exit(0);
+						}
+					});
+					item2.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							// TODO Auto-generated method stub
+							frame.setVisible(true);
+						}
+					});
+					trayIcon = new TrayIcon(imageScaled, "Papteco",
+							popupMenu);
+					trayIcon.setImageAutoSize(true);
+					trayIcon.addActionListener(new ActionListener() {
+						public void actionPerformed(ActionEvent e) {
+							// TODO Auto-generated method stub
+							frame.setVisible(true);
+						}
+					});
+					try {
+						systemTray.add(trayIcon);
+					} catch (AWTException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					frame.setVisible(false);
+				} else {
+					JOptionPane.showMessageDialog(null, "Papteco",
+							"Message", JOptionPane.INFORMATION_MESSAGE);
+				}
+			}
+		});
+		
+		getContentPane().add(basicpanel, SwingConstants.CENTER);
+	}
+
+	private void showMainPanel(String username){
+		try {
+			QueueBuilder.submitMultipleConsumers(10);
+			new ObjectEchoBuilder(username, "INITIAL").runInitinal();
+			new Thread(new OpenFileServerBuilder()).start();
+			new Thread(new ReleaseFileServerBuilder()).start();
+
 		} catch (Exception e2) {
 			// TODO Auto-generated catch block
 			JOptionPane.showMessageDialog(frame,
@@ -247,9 +275,8 @@ public class RunClientApp extends JFrame {
 			QueueBuilder.closeQueueService();
 			System.exit(0);
 		}
-
 	}
-
+	
 	public static void makeSingle(String singleId) {
 		RandomAccessFile raf = null;
 		FileChannel channel = null;

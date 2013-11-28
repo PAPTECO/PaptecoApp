@@ -26,18 +26,21 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 
 import com.papteco.web.beans.QueueItem;
 
-public class ObjectEchoBuilder {
+public class ObjectEchoBuilder extends BasicBuilder{
 
-	private final String host = "localhost";
-	private final int port = 8081;
 	private String inPrjCde;
 	private QueueItem qItem = new QueueItem();
+	private String username;
 
 	public ObjectEchoBuilder(){
 	}
 	
 	public ObjectEchoBuilder(String inPrjCde) {
 		this.inPrjCde = inPrjCde;
+	}
+	
+	public ObjectEchoBuilder(String username, String flag) {
+		this.username = username;
 	}
 
 	public ObjectEchoBuilder(QueueItem qItem) {
@@ -57,10 +60,10 @@ public class ObjectEchoBuilder {
 									new ObjectEncoder(),
 									new NewObjectDecoder(ClassResolvers
 											.cacheDisabled(null)),
-									new InitinalClientHandler("conygychen"));
+									new InitinalClientHandler(username));
 						}
 					});
-			b.connect(host, port).sync().channel().closeFuture().sync();
+			b.connect(envsetting.getProperty("pims_ip"), PortTranslater(envsetting.getProperty("comm_nett_port"))).sync().channel().closeFuture().sync();
 		} finally {
 			group.shutdownGracefully();
 		}
@@ -82,7 +85,7 @@ public class ObjectEchoBuilder {
 									new SelProjectClientHandler(inPrjCde));
 						}
 					});
-			b.connect(host, port).sync().channel().closeFuture().sync();
+			b.connect(envsetting.getProperty("pims_ip"), PortTranslater(envsetting.getProperty("comm_nett_port"))).sync().channel().closeFuture().sync();
 		} finally {
 			group.shutdownGracefully();
 		}
@@ -104,7 +107,7 @@ public class ObjectEchoBuilder {
 									new DownFileClientHandler(qItem));
 						}
 					});
-			b.connect(host, port).sync().channel().closeFuture().sync();
+			b.connect(envsetting.getProperty("pims_ip"), PortTranslater(envsetting.getProperty("comm_nett_port"))).sync().channel().closeFuture().sync();
 		} finally {
 			group.shutdownGracefully();
 		}

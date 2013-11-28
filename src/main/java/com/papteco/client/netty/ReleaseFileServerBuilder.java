@@ -27,12 +27,9 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 /**
  * Modification of {@link EchoServer} which utilizes Java object serialization.
  */
-public class ReleaseFileServerBuilder implements Runnable{
+public class ReleaseFileServerBuilder extends BasicBuilder implements Runnable{
 
-    private final int port;
-
-    public ReleaseFileServerBuilder(int port) {
-        this.port = port;
+    public ReleaseFileServerBuilder() {
     }
 
     public void run() {
@@ -53,7 +50,7 @@ public class ReleaseFileServerBuilder implements Runnable{
              });
 
             // Bind and start to accept incoming connections.
-            b.bind(port).sync().channel().closeFuture().sync();
+            b.bind(PortTranslater(envsetting.getProperty("rlse_file_port"))).sync().channel().closeFuture().sync();
         } catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -64,12 +61,12 @@ public class ReleaseFileServerBuilder implements Runnable{
     }
 
     public static void main(String[] args) throws Exception {
-        int port;
-        if (args.length > 0) {
-            port = Integer.parseInt(args[0]);
-        } else {
-            port = 8080;
-        }
-        new ReleaseFileServerBuilder(port).run();
+//        int port;
+//        if (args.length > 0) {
+//            port = Integer.parseInt(args[0]);
+//        } else {
+//            port = 8080;
+//        }
+//        new ReleaseFileServerBuilder(port).run();
     }
 }
