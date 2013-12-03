@@ -13,6 +13,7 @@ public class ClientRequestBean implements Serializable {
 	private Object prjObj;
 	private QueueItem qItem;
 	private IPItem ipItem;
+	private String reqUser;
 	
 	public ClientRequestBean(char actionType){
 		this.actionType = actionType;
@@ -58,6 +59,14 @@ public class ClientRequestBean implements Serializable {
 
 	public void setIpItem(IPItem ipItem) {
 		this.ipItem = ipItem;
+	}
+
+	public String getReqUser() {
+		return reqUser;
+	}
+
+	public void setReqUser(String reqUser) {
+		this.reqUser = reqUser;
 	}
 
 }

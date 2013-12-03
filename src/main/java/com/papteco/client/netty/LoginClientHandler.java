@@ -63,6 +63,9 @@ public class LoginClientHandler extends ChannelInboundHandlerAdapter {
 			throws Exception {
 		// Echo back the received object to the server.
 		LoginStatusUtil.loginStatus = (String) msg;
+		if(LoginStatusUtil.loginStatus.equals("SUCC")){
+			LoginStatusUtil.LOGIN_USER = username;
+		}
 		ctx.close();
 	}
 

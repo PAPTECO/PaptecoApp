@@ -24,6 +24,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 
+import com.papteco.client.ui.LoginStatusUtil;
 import com.papteco.web.beans.QueueItem;
 
 public class ObjectEchoBuilder extends BasicBuilder{
@@ -82,7 +83,7 @@ public class ObjectEchoBuilder extends BasicBuilder{
 									new ObjectEncoder(),
 									new NewObjectDecoder(ClassResolvers
 											.cacheDisabled(null)),
-									new SelProjectClientHandler(inPrjCde));
+									new SelProjectClientHandler(inPrjCde, LoginStatusUtil.LOGIN_USER));
 						}
 					});
 			b.connect(envsetting.getProperty("pims_ip"), PortTranslater(envsetting.getProperty("comm_nett_port"))).sync().channel().closeFuture().sync();

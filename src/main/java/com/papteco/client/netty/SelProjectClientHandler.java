@@ -44,8 +44,9 @@ public class SelProjectClientHandler extends ChannelInboundHandlerAdapter {
 	/**
 	 * Creates a client-side handler.
 	 */
-	public SelProjectClientHandler(String prjCde) {
+	public SelProjectClientHandler(String prjCde, String reqUser) {
 		req.setPrjCde(prjCde);
+		req.setReqUser(reqUser);
 		this.prjCde = prjCde;
 	}
 
@@ -72,7 +73,10 @@ public class SelProjectClientHandler extends ChannelInboundHandlerAdapter {
 			this.submitFileJobsToQueue(prj);
 			JPromptWindow.showInfoMsg("Request Complete !");
 		} else {
-			JPromptWindow.showWarnMsg("Cannot find the specific project.");
+			if(bean.getReqUser() == null)
+				JPromptWindow.showWarnMsg("Cannot find the user.");
+			else
+				JPromptWindow.showWarnMsg("Cannot find the specific project.");
 		}
 		ctx.close();
 	}
