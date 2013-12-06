@@ -19,18 +19,14 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.papteco.client.action.FileActionUtils;
 import com.papteco.client.ui.EnvConstant;
 import com.papteco.web.beans.ClientRequestBean;
-import com.papteco.web.beans.QueueItem;
 
 /**
  * Handles both client-side and server-side handler depending on which
@@ -42,6 +38,12 @@ public class ReleaseFileServerHandler extends ChannelInboundHandlerAdapter {
             ReleaseFileServerHandler.class.getName());
 
     @Override
+	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+		// TODO Auto-generated method stub
+		ctx.close();
+	}
+
+	@Override
     public void channelRead(
             ChannelHandlerContext ctx, Object msg) throws Exception {
     	ClientRequestBean bean = (ClientRequestBean) msg;
