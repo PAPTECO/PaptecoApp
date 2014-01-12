@@ -12,6 +12,8 @@ public class UsersFormBean implements Serializable {
 	private String createUserName;
 	private String createPassword;
 	private String createEmail;
+	private String createLocalMailFilePath;
+	private String createLocalProjectPath;
 	private List<String> createRoles;
 
 	private String additional1;
@@ -137,11 +139,30 @@ public class UsersFormBean implements Serializable {
 		this.additional10 = additional10;
 	}
 
+	public String getCreateLocalMailFilePath() {
+		return createLocalMailFilePath;
+	}
+
+	public void setCreateLocalMailFilePath(String createLocalMailFilePath) {
+		this.createLocalMailFilePath = createLocalMailFilePath;
+	}
+
+	public String getCreateLocalProjectPath() {
+		return createLocalProjectPath;
+	}
+
+	public void setCreateLocalProjectPath(String createLocalProjectPath) {
+		this.createLocalProjectPath = createLocalProjectPath;
+	}
+
 	@Override
 	public String toString() {
 		return "UsersFormBean [createUserName=" + createUserName
 				+ ", createPassword=" + createPassword + ", createEmail="
-				+ createEmail + ", createRoles=" + createRoles + "]";
+				+ createEmail + ", createLocalMailFilePath="
+				+ createLocalMailFilePath + ", createLocalProjectPath="
+				+ createLocalProjectPath + ", createRoles=" + createRoles + "]";
 	}
+
 
 }

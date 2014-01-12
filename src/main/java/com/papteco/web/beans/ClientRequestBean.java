@@ -14,6 +14,8 @@ public class ClientRequestBean implements Serializable {
 	private QueueItem qItem;
 	private IPItem ipItem;
 	private String reqUser;
+	private String timestamp;
+	private String mailfileSuffix;
 	private String additional1;
 	private String additional2;
 	private String additional3;
@@ -76,6 +78,22 @@ public class ClientRequestBean implements Serializable {
 
 	public void setReqUser(String reqUser) {
 		this.reqUser = reqUser;
+	}
+
+	public String getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(String timestamp) {
+		this.timestamp = timestamp;
+	}
+
+	public String getMailfileSuffix() {
+		return mailfileSuffix;
+	}
+
+	public void setMailfileSuffix(String mailfileSuffix) {
+		this.mailfileSuffix = mailfileSuffix;
 	}
 
 	public String getAdditional1() {
