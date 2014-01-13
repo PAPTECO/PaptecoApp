@@ -277,7 +277,7 @@ public class RunClientApp extends JFrame {
 						systemTray.remove(trayIcon);
 						System.out.println("trayIcon removed");
 					}
-					URL resource = this.getClass().getResource("/icon.jpg");
+					URL resource = this.getClass().getResource("/logo.png");
 					BufferedImage imageScaled = null;
 					BufferedImage in;
 					try {

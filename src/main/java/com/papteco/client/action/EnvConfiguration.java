@@ -1,5 +1,6 @@
 package com.papteco.client.action;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -17,9 +18,10 @@ public class EnvConfiguration {
 
 	public static Properties loadEnvProperties() {
 		envsetting = new Properties();
-		InputStream in = EnvConfiguration.class
-				.getResourceAsStream("/environment.properties");
+		/*InputStream in = EnvConfiguration.class
+				.getResourceAsStream("/environment.properties");*/
 		try {
+			InputStream in = new FileInputStream("environment.properties");  
 			envsetting.load(in);
 			in.close();
 		} catch (IOException e) {
