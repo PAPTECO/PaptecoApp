@@ -8,9 +8,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.log4j.Logger;
+
 import com.papteco.client.ui.EnvConstant;
 
 public class PathCacheUtils{
+	protected static final Logger log = Logger.getLogger(PathCacheUtils.class); 
 	public static final String PRJ_PATH = "PRJ";
 	public static final String MAIL_PATH = "MAIL";
 	
@@ -24,7 +27,7 @@ public class PathCacheUtils{
         	tmpfile = new File(System.getProperty("java.io.tmpdir") + "pimsmail_" + EnvConstant.LOGIN_USER);
         	tmpfile.createNewFile();
         }else{
-        	System.out.println("PathCache type is invalid!");
+        	log.info("PathCache type is invalid!");
         }
     	buff = new BufferedOutputStream(new FileOutputStream(tmpfile));
 		buff.write(path.getBytes("utf-8"));

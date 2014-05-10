@@ -3,6 +3,7 @@ package com.papteco.client.action;
 import java.io.File;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -12,6 +13,7 @@ import com.papteco.client.ui.EnvConstant;
 
 public class QuartzJob implements Job {
 
+	protected static final Logger log = Logger.getLogger(QuartzJob.class); 
 	public QuartzJob() {
 
 	}
@@ -26,7 +28,7 @@ public class QuartzJob implements Job {
 //				System.out.println("Uploading Mail File.");
 				new QuartzMailBackupBuilder().runMailBackup();
 			}else{
-				System.out.println("Mail-File Path is invalid!");
+//				log.info("Mail-File Path is invalid!");
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

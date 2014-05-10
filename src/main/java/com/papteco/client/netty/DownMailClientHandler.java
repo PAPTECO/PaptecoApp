@@ -26,21 +26,21 @@ import java.util.logging.Logger;
 
 import com.papteco.client.ui.EnvConstant;
 import com.papteco.web.beans.ClientRequestBean;
-import com.papteco.web.beans.QueueItem;
 
-public class DownFileClientHandler extends ChannelInboundHandlerAdapter {
+public class DownMailClientHandler extends ChannelInboundHandlerAdapter {
 
 	private static final Logger log = Logger
 			.getLogger(SelProjectClientHandler.class.getName());
 
 	private ClientRequestBean req = new ClientRequestBean(
-			NettyConstant.DOWN_FILE_ACTION_TYPE);
+			NettyConstant.DOWN_MAIL_FILE);
 
 	/**
 	 * Creates a client-side handler.
 	 */
-	public DownFileClientHandler(QueueItem qItem) {
-		req.setqItem(qItem);
+	public DownMailClientHandler(String username, String mailfile) {
+		req.setReqUser(username);
+		req.setAdditional1(mailfile);
 	}
 
 	@Override
@@ -61,8 +61,7 @@ public class DownFileClientHandler extends ChannelInboundHandlerAdapter {
 		// Echo back the received object to the server.
 		ClientRequestBean bean = (ClientRequestBean) msg;
 		if (bean.getPrjObj() != null) {
-			File file = new File(this.combineFolderPath(EnvConstant.LCL_STORING_PATH, bean
-					.getqItem().getPrjCde()), bean.getqItem().getParam());
+			File file = new File(this.combineFolderPath(EnvConstant.LCL_STORING_PATH, "MAILS_BACKUP"), bean.getAdditional1());
 			log.info("Writing local file: " + file.getPath());
 			if (!file.exists()) {
 				log.info("File not existing: " + file.getPath());

@@ -34,7 +34,7 @@ import com.papteco.web.beans.ClientRequestBean;
  */
 public class ReleaseFileServerHandler extends ChannelInboundHandlerAdapter {
 
-    private static final Logger logger = Logger.getLogger(
+    private static final Logger log = Logger.getLogger(
             ReleaseFileServerHandler.class.getName());
 
     @Override
@@ -60,7 +60,7 @@ public class ReleaseFileServerHandler extends ChannelInboundHandlerAdapter {
         	        bean.setPrjObj(buffer);
         		}
     		} else {
-    			System.out.println("Cannot find the specific file.");
+    			log.info("Cannot find the specific file.");
     		}
     		break;
     	}
@@ -75,7 +75,7 @@ public class ReleaseFileServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(
             ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        logger.log(
+        log.log(
                 Level.WARNING,
                 "Unexpected exception from downstream.", cause);
         ctx.close();

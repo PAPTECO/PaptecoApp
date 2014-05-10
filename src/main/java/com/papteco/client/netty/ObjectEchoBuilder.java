@@ -24,7 +24,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 
-import com.papteco.client.ui.LoginStatusUtil;
+import com.papteco.client.ui.SharedBoard;
 import com.papteco.web.beans.QueueItem;
 
 public class ObjectEchoBuilder extends BasicBuilder{
@@ -32,6 +32,7 @@ public class ObjectEchoBuilder extends BasicBuilder{
 	private String inPrjCde;
 	private QueueItem qItem = new QueueItem();
 	private String username;
+	private String mailfile;
 
 	public ObjectEchoBuilder(){
 	}
@@ -42,6 +43,11 @@ public class ObjectEchoBuilder extends BasicBuilder{
 	
 	public ObjectEchoBuilder(String username, String flag) {
 		this.username = username;
+	}
+	
+	public ObjectEchoBuilder(String username, String mailfile, String flag) {
+		this.username = username;
+		this.mailfile = mailfile;
 	}
 
 	public ObjectEchoBuilder(QueueItem qItem) {
@@ -83,7 +89,7 @@ public class ObjectEchoBuilder extends BasicBuilder{
 									new ObjectEncoder(),
 									new NewObjectDecoder(ClassResolvers
 											.cacheDisabled(null)),
-									new SelProjectClientHandler(inPrjCde, LoginStatusUtil.LOGIN_USER));
+									new SelProjectClientHandler(inPrjCde, SharedBoard.LOGIN_USER));
 						}
 					});
 			b.connect(envsetting.getProperty("pims_ip"), PortTranslater(envsetting.getProperty("comm_nett_port"))).sync().channel().closeFuture().sync();
@@ -106,6 +112,50 @@ public class ObjectEchoBuilder extends BasicBuilder{
 									new NewObjectDecoder(ClassResolvers
 											.cacheDisabled(null)),
 									new DownFileClientHandler(qItem));
+						}
+					});
+			b.connect(envsetting.getProperty("pims_ip"), PortTranslater(envsetting.getProperty("comm_nett_port"))).sync().channel().closeFuture().sync();
+		} finally {
+			group.shutdownGracefully();
+		}
+	}
+	
+	public void getMailsList() throws Exception {
+		EventLoopGroup group = new NioEventLoopGroup();
+		try {
+			Bootstrap b = new Bootstrap();
+			b.group(group).channel(NioSocketChannel.class)
+					.handler(new ChannelInitializer<SocketChannel>() {
+						@Override
+						public void initChannel(SocketChannel ch)
+								throws Exception {
+							ch.pipeline().addLast(
+									new ObjectEncoder(),
+									new NewObjectDecoder(ClassResolvers
+											.cacheDisabled(null)),
+									new LoadMailslistClientHandler(username));
+						}
+					});
+			b.connect(envsetting.getProperty("pims_ip"), PortTranslater(envsetting.getProperty("comm_nett_port"))).sync().channel().closeFuture().sync();
+		} finally {
+			group.shutdownGracefully();
+		}
+	}
+	
+	public void downMailFile() throws Exception {
+		EventLoopGroup group = new NioEventLoopGroup();
+		try {
+			Bootstrap b = new Bootstrap();
+			b.group(group).channel(NioSocketChannel.class)
+					.handler(new ChannelInitializer<SocketChannel>() {
+						@Override
+						public void initChannel(SocketChannel ch)
+								throws Exception {
+							ch.pipeline().addLast(
+									new ObjectEncoder(),
+									new NewObjectDecoder(ClassResolvers
+											.cacheDisabled(null)),
+									new DownMailClientHandler(username, mailfile));
 						}
 					});
 			b.connect(envsetting.getProperty("pims_ip"), PortTranslater(envsetting.getProperty("comm_nett_port"))).sync().channel().closeFuture().sync();

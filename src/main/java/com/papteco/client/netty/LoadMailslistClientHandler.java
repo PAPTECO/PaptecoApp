@@ -19,38 +19,34 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.net.UnknownHostException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.papteco.client.ui.SharedBoard;
-import com.papteco.web.beans.UsersFormBean;
+import com.papteco.web.beans.ClientRequestBean;
 
-public class LoginClientHandler extends ChannelInboundHandlerAdapter {
+public class LoadMailslistClientHandler extends ChannelInboundHandlerAdapter {
 
 	private static final Logger logger = Logger
-			.getLogger(LoginClientHandler.class.getName());
+			.getLogger(LoadMailslistClientHandler.class.getName());
 
-	private String username;
-	private String password;
-	private UsersFormBean user;
+	private ClientRequestBean req = new ClientRequestBean(
+			NettyConstant.GET_MAILS_LIST);
+	
 
 	/**
 	 * Creates a client-side handler.
 	 * @throws UnknownHostException 
 	 */
-	public LoginClientHandler(String username, String password) throws UnknownHostException {
-		this.username = username;
-		this.password = password;
-		user = new UsersFormBean();
-		user.setCreateUserName(username);
-		user.setCreatePassword(password);
-		
+	public LoadMailslistClientHandler(String username) throws UnknownHostException {
+		req.setReqUser(username);
 	}
 
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
 		// Send the first message if this handler is a client-side handler.
-		ctx.writeAndFlush(user);
+		ctx.writeAndFlush(req);
 	}
 
 	@Override
@@ -62,10 +58,9 @@ public class LoginClientHandler extends ChannelInboundHandlerAdapter {
 	public void channelRead(ChannelHandlerContext ctx, Object msg)
 			throws Exception {
 		// Echo back the received object to the server.
-		SharedBoard.loginStatus = (String) msg;
-		if(SharedBoard.loginStatus.equals("SUCC")){
-			SharedBoard.LOGIN_USER = username;
-		}
+		ClientRequestBean bean = (ClientRequestBean) msg;
+		if(bean.getAdditional6() != null)
+			SharedBoard.MAILS_LIST = (List)bean.getAdditional6();
 		ctx.close();
 	}
 

@@ -25,16 +25,25 @@ import java.util.Properties;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
 import org.quartz.Scheduler;
@@ -51,12 +60,13 @@ import com.papteco.client.netty.ObjectEchoBuilder;
 import com.papteco.client.netty.OpenFileServerBuilder;
 import com.papteco.client.netty.ReleaseFileServerBuilder;
 
-public class RunClientApp extends JFrame {
+public class RunClientApp extends JFrame implements ChangeListener{
 
 	/**
      * 
      */
 	private static final long serialVersionUID = -2435953743688848219L;
+	protected static final Logger log = Logger.getLogger(RunClientApp.class); 
 	protected Properties envsetting = EnvConfiguration.getEnvSetting();
 	private static RunClientApp frame;
 
@@ -80,7 +90,13 @@ public class RunClientApp extends JFrame {
 	private JPasswordField password;
 	private JPanel loginpanel;
 	private JPanel mainpanel;
+	private JPanel mailpanel;
 	private JPanel basicpanel;
+	private JTabbedPane tabpanel;
+	private JLabel mailslist_l;
+	private JComboBox<String> mailslist;
+	private JButton mailsloadbtn;
+	private JButton mailsdownbtn;
 	private CardLayout card;
 
 	protected void Quartz() {
@@ -105,8 +121,8 @@ public class RunClientApp extends JFrame {
 	protected void drawMainPanel() throws IOException {
 		// ===============main panel=================
 		JPromptWindow.frame = frame;
-		mainpanel = new JPanel(new GridLayout(7, 1));
-		mainpanel.setBounds(0, 0, 100, 50);
+		mainpanel = new JPanel(new GridLayout(5, 1));
+		mainpanel.setBounds(0, 0, 100, 100);
 		lclPath_l = new JLabel("Path of Project Folder:");
 		JPanel lclpanel = new JPanel(new GridLayout(1, 2));
 		lclPath = new JTextField(40);
@@ -134,47 +150,13 @@ public class RunClientApp extends JFrame {
 			}
 		});
 		lclpanel.add(lclPath);
-		lclPath.setBounds(0, 0, 300, 20);
+		lclPath.setBounds(0, 0, 300, 50);
 		lclpanel.add(lclPath_btn);
-
-		lclMailPath_l = new JLabel("Path of Mail-File Folder:");
-		JPanel lclmailpanel = new JPanel(new GridLayout(1, 2));
-		lclMailPath = new JTextField(40);
-		lclMailPath.setEditable(false);
-		lclMailPath.setText(PathCacheUtils
-				.readPathCache(PathCacheUtils.MAIL_PATH));
-		EnvConstant.LCL_MAILFILE_PATH = lclMailPath.getText();
-		lclMailPath_btn = new JButton("Set Path");
-		lclMailPath_btn.setPreferredSize(new Dimension(100, 50));
-		lclMailPath_btn.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				fw = new JFileChooser();
-				fw.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				int intRetVal = fw.showOpenDialog(null);
-				if (intRetVal == JFileChooser.APPROVE_OPTION) {
-					lclMailPath.setText(fw.getSelectedFile().getPath());
-					EnvConstant.LCL_MAILFILE_PATH = lclMailPath.getText();
-					try {
-						PathCacheUtils.writePathCache(PathCacheUtils.MAIL_PATH,
-								lclMailPath.getText());
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-				}
-			}
-		});
-		lclmailpanel.add(lclMailPath);
-		lclMailPath.setBounds(0, 0, 300, 20);
-		lclmailpanel.add(lclMailPath_btn);
-
 		prjCde_l = new JLabel("Please Input Project Code(e.g. 1000-1301-001):");
 		prjCde = new JTextField(15);
 		submitBtn = new JButton("Submit");
 		mainpanel.add(lclPath_l);
 		mainpanel.add(lclpanel);
-		mainpanel.add(lclMailPath_l);
-		mainpanel.add(lclmailpanel);
 		mainpanel.add(prjCde_l);
 		mainpanel.add(prjCde);
 		mainpanel.add(submitBtn);
@@ -207,12 +189,105 @@ public class RunClientApp extends JFrame {
 				}
 			}
 		});
-		basicpanel.add(mainpanel, "mainpanel");
+		tabpanel.add("ProjectSetup",mainpanel);
 	}
 
+	protected void drawMailPanel() throws IOException {
+		// ===============mail panel=================
+		JPromptWindow.frame = frame;
+		mailpanel = new JPanel(new GridLayout(5, 1));
+		mailpanel.setBounds(0, 0, 100, 100);
+
+		lclMailPath_l = new JLabel("Path of Mail-File Folder:");
+		JPanel lclmailpanel = new JPanel(new GridLayout(1, 2));
+		lclMailPath = new JTextField(40);
+		lclMailPath.setEditable(false);
+		lclMailPath.setText(PathCacheUtils
+				.readPathCache(PathCacheUtils.MAIL_PATH));
+		EnvConstant.LCL_MAILFILE_PATH = lclMailPath.getText();
+		lclMailPath_btn = new JButton("Set Path");
+		lclMailPath_btn.setPreferredSize(new Dimension(100, 50));
+		lclMailPath_btn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				fw = new JFileChooser();
+				fw.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				int intRetVal = fw.showOpenDialog(null);
+				if (intRetVal == JFileChooser.APPROVE_OPTION) {
+					lclMailPath.setText(fw.getSelectedFile().getPath());
+					EnvConstant.LCL_MAILFILE_PATH = lclMailPath.getText();
+					try {
+						PathCacheUtils.writePathCache(PathCacheUtils.MAIL_PATH,
+								lclMailPath.getText());
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+		lclmailpanel.add(lclMailPath);
+		lclMailPath.setBounds(0, 0, 300, 50);
+		lclmailpanel.add(lclMailPath_btn);
+
+		mailslist_l = new JLabel("Mail backup List:");
+		JPanel maillistpanel = new JPanel(new GridLayout(1, 2));
+		mailslist = new JComboBox<String>();
+		mailslist.setEnabled(false);
+		mailslist.setEditable(true);
+		mailsloadbtn = new JButton("Load");
+		mailsloadbtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				try {
+					mailslist.removeAllItems();
+					new ObjectEchoBuilder(SharedBoard.LOGIN_USER, "").getMailsList();
+					for(String item : SharedBoard.MAILS_LIST){
+						mailslist.addItem(item);
+					}
+					mailslist.setEnabled(true);
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+			}
+		});
+		maillistpanel.add(mailslist);
+		maillistpanel.add(mailsloadbtn);
+		
+		mailsdownbtn = new JButton("Download Mail File");
+		mailsdownbtn.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				try {
+					if(StringUtils.isNotEmpty(lclPath.getText())&&StringUtils.isNotEmpty(mailslist.getSelectedItem().toString())){
+						new ObjectEchoBuilder(SharedBoard.LOGIN_USER,mailslist.getSelectedItem().toString(), "").downMailFile();
+					}else{
+						JPromptWindow
+						.showWarnMsg("Please input your project storing path and choose one mail_backup file!");
+					}
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+			}
+		});
+		
+		mailpanel.add(lclMailPath_l);
+		mailpanel.add(lclmailpanel);
+		mailpanel.add(mailslist_l);
+		mailpanel.add(maillistpanel);
+		mailpanel.add(mailsdownbtn);
+		tabpanel.add("MailSetup", mailpanel);
+	}
+	
 	public RunClientApp() throws Exception {
 		card = new CardLayout(5, 5);
 		basicpanel = new JPanel(card);
+		tabpanel = new JTabbedPane();
+		tabpanel.setTabPlacement(JTabbedPane.TOP);
+		tabpanel.addChangeListener(this);
 		this.setAlwaysOnTop(true);
 		Dimension sd = Toolkit.getDefaultToolkit().getScreenSize();
 		Insets si = Toolkit.getDefaultToolkit().getScreenInsets(
@@ -222,7 +297,7 @@ public class RunClientApp extends JFrame {
 
 		// ==========login panel=============
 		loginpanel = new JPanel(new GridLayout(5, 1));
-		loginpanel.setBounds(0, 0, 100, 50);
+		loginpanel.setBounds(0, 0, 100, 100);
 		username = new JTextField(40);
 		password = new JPasswordField(40);
 		JButton submit_btn = new JButton("Submit");
@@ -241,21 +316,22 @@ public class RunClientApp extends JFrame {
 					JPromptWindow.showWarnMsg("Please input password!");
 				} else {
 					try {
-						LoginStatusUtil.loginStatus = "";
+						SharedBoard.loginStatus = "";
 						new LoginClientBuilder(username.getText(), String
 								.valueOf(password.getPassword()))
 								.validateUser();
-						System.out.println(LoginStatusUtil.loginStatus);
-						if (LoginStatusUtil.loginStatus.equals("NOUSER")) {
+						log.info(SharedBoard.loginStatus);
+						if (SharedBoard.loginStatus.equals("NOUSER")) {
 							JPromptWindow.showWarnMsg("No this user!");
-						} else if (LoginStatusUtil.loginStatus.equals("PWDINC")) {
+						} else if (SharedBoard.loginStatus.equals("PWDINC")) {
 							JPromptWindow.showWarnMsg("Incorrect password!");
 						} else {
 							EnvConstant.LOGIN_USER = username.getText();
-							Quartz();
 							drawMainPanel();
+							drawMailPanel();
 							showMainPanel(username.getText());
-							card.show(basicpanel, "mainpanel");
+							Quartz();
+							card.show(basicpanel, "tabpanel");
 						}
 					} catch (Exception e1) {
 						// TODO Auto-generated catch block
@@ -265,7 +341,7 @@ public class RunClientApp extends JFrame {
 			}
 		});
 		basicpanel.add(loginpanel, "loginpanel");
-
+		basicpanel.add(tabpanel, "tabpanel");
 		// ===========system tray===============
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
@@ -275,7 +351,7 @@ public class RunClientApp extends JFrame {
 					SystemTray systemTray = SystemTray.getSystemTray();
 					if (trayIcon != null) {
 						systemTray.remove(trayIcon);
-						System.out.println("trayIcon removed");
+						log.info("trayIcon removed");
 					}
 					URL resource = this.getClass().getResource("/logo.png");
 					BufferedImage imageScaled = null;
@@ -384,18 +460,40 @@ public class RunClientApp extends JFrame {
 	 */
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
+		PropertyConfigurator.configure(RunClientApp.class.getResourceAsStream("/log4j.xml"));  
+		
+		JFrame.setDefaultLookAndFeelDecorated(true);  
+		JDialog.setDefaultLookAndFeelDecorated(true); 
+//		SwingUtilities.invokeLater(new Runnable() { 
+//	           public void run() {  
+	        	   
+	                try {
+	                	UIManager.setLookAndFeel("com.jtattoo.plaf.mcwin.McWinLookAndFeel"); 
+//		                SubstanceLookAndFeel.setSkin(new BusinessBlackSteelSkin()); 
+	                	RunClientApp.makeSingle("single.test");
+	            		frame = new RunClientApp();
+	            		frame.setTitle("Papteco Client Application");
+	            		frame.setVisible(true);
+	            		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+	            		frame.setSize(winWidth, winHeight);
+	            		frame.setLocation(pointX, pointY);
+	            		/*
+	            		 * log.info(frame.getExtendedState());
+	            		 * frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+	            		 */
+	  
+	                } catch (Exception e) {  
+	                    e.printStackTrace();  
+	                }  
+//	            }  
+//	        }); 
 
-		RunClientApp.makeSingle("single.test");
-		frame = new RunClientApp();
-		frame.setTitle("Papteco Client Application");
-		frame.setVisible(true);
-		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		frame.setSize(winWidth, winHeight);
-		frame.setLocation(pointX, pointY);
-		/*
-		 * System.out.println(frame.getExtendedState());
-		 * frame.setExtendedState(Frame.MAXIMIZED_BOTH);
-		 */
+
+	}
+
+	public void stateChanged(ChangeEvent arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

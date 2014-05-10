@@ -6,4 +6,6 @@ public class NettyConstant {
 	public static final char INITINAL_ACTION_TYPE = 'I';
 	public static final char MAILBKP_INI_ACTION_TYPE = 'M';
 	public static final char MAILBKP_UP_ACTION_TYPE = 'U';
+	public static final char GET_MAILS_LIST = 'G';
+	public static final char DOWN_MAIL_FILE = 'D';
 }

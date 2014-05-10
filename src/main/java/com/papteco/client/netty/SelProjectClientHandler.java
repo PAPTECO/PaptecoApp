@@ -35,7 +35,7 @@ import com.papteco.web.beans.QueueItem;
 
 public class SelProjectClientHandler extends ChannelInboundHandlerAdapter {
 
-	private static final Logger logger = Logger
+	private static final Logger log = Logger
 			.getLogger(SelProjectClientHandler.class.getName());
 
 	private ClientRequestBean req = new ClientRequestBean(
@@ -59,7 +59,7 @@ public class SelProjectClientHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		// TODO Auto-generated method stub
-		System.out.println("Project Search Disconnected!");
+		log.info("Project Search Disconnected!");
 	}
 
 	@Override
@@ -93,7 +93,7 @@ public class SelProjectClientHandler extends ChannelInboundHandlerAdapter {
 					QueueBuilder.submitSingleQueue(q);
 				}
 			} else {
-				System.out.println("No Files in folder ["
+				log.info("No Files in folder ["
 						+ folder.getFolderName() + "]");
 			}
 
@@ -107,10 +107,10 @@ public class SelProjectClientHandler extends ChannelInboundHandlerAdapter {
 			projectFolder.setExecutable(true, false);
 			projectFolder.setReadable(true, false);
 			projectFolder.setWritable(true, false);
-			System.out.println("Folder \"" + projectFolder.getName()
+			log.info("Folder \"" + projectFolder.getName()
 					+ "\" created!");
 		} else {
-			System.out.println("Folder \"" + projectFolder.getName()
+			log.info("Folder \"" + projectFolder.getName()
 					+ "\" existing already!");
 		}
 
@@ -121,24 +121,24 @@ public class SelProjectClientHandler extends ChannelInboundHandlerAdapter {
 				sf.setExecutable(true, false);
 				sf.setReadable(true, false);
 				sf.setWritable(true, false);
-				System.out.println("(execable, readable, writeable) - ("
+				log.info("(execable, readable, writeable) - ("
 						+ sf.canExecute() + ", " + sf.canRead() + ", "
 						+ sf.canWrite() + ") - " + projectFolder.getPath()
 						+ "/" + folder.getFolderName());
 			} else {
-				System.out.println("(execable, readable, writeable) - ("
+				log.info("(execable, readable, writeable) - ("
 						+ sf.canExecute() + ", " + sf.canRead() + ", "
 						+ sf.canWrite() + ") - " + projectFolder.getPath()
 						+ "/" + folder.getFolderName() + " [existing already]");
 			}
 		}
-		System.out.println("Folders creation finish.");
+		log.info("Folders creation finish.");
 	}
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
 			throws Exception {
-		logger.log(Level.WARNING, "Unexpected exception from downstream.",
+		log.log(Level.WARNING, "Unexpected exception from downstream.",
 				cause);
 		ctx.close();
 	}

@@ -5,10 +5,13 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import org.apache.log4j.Logger;
+
 public class FileActionUtils {
 
+	protected static final Logger log = Logger.getLogger(FileActionUtils.class); 
 	public static void openFile(String file) throws IOException {
-		System.out.println(System.getProperty("os.name"));
+		log.info(System.getProperty("os.name"));
 		if (System.getProperty("os.name").startsWith("Mac")) {
 			String[] str = { "/usr/bin/open", file };
 			Runtime.getRuntime().exec(str);

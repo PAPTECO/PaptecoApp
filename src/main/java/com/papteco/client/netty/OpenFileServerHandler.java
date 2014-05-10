@@ -35,7 +35,7 @@ import com.papteco.web.beans.QueueItem;
  */
 public class OpenFileServerHandler extends ChannelInboundHandlerAdapter {
 
-    private static final Logger logger = Logger.getLogger(
+    private static final Logger log = Logger.getLogger(
             OpenFileServerHandler.class.getName());
 
     @Override
@@ -48,7 +48,7 @@ public class OpenFileServerHandler extends ChannelInboundHandlerAdapter {
     		if (bean.getPrjObj() != null) {
     			File file = new File(EnvConstant.LCL_STORING_PATH, bean.getqItem().getParam());
     			this.prepareFolderPath(file.getPath());
-    			System.out.println("Writing local file: " + file.getPath());
+    			log.info("Writing local file: " + file.getPath());
     			if (!file.exists()) {
     				file.createNewFile();
     				
@@ -62,12 +62,12 @@ public class OpenFileServerHandler extends ChannelInboundHandlerAdapter {
     			}
     			
     		} else {
-    			System.out.println("Cannot find the specific file.");
+    			log.info("Cannot find the specific file.");
     		}
     		break;
     	case 'O':
     		QueueItem qItem = bean.getqItem();
-        	System.out.println(qItem.getActionType()+":"+qItem.getParam());
+        	log.info(qItem.getActionType()+":"+qItem.getParam());
         	File file = new File(EnvConstant.LCL_STORING_PATH,qItem.getParam());
         	if(file.exists()){
         		FileActionUtils.openFile(file.getPath());
@@ -86,7 +86,7 @@ public class OpenFileServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(
             ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        logger.log(
+        log.log(
                 Level.WARNING,
                 "Unexpected exception from downstream.", cause);
         ctx.close();
