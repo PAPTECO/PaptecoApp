@@ -115,7 +115,9 @@ public class ObjectEchoBuilder extends BasicBuilder{
 						}
 					});
 			b.connect(envsetting.getProperty("pims_ip"), PortTranslater(envsetting.getProperty("comm_nett_port"))).sync().channel().closeFuture().sync();
-		} finally {
+		} catch(Throwable e){
+			e.printStackTrace();
+		}finally {
 			group.shutdownGracefully();
 		}
 	}

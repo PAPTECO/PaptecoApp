@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.papteco.client.action.FileActionUtils;
 import com.papteco.client.ui.EnvConstant;
 import com.papteco.web.beans.ClientRequestBean;
 
@@ -51,7 +52,7 @@ public class ReleaseFileServerHandler extends ChannelInboundHandlerAdapter {
     	{
     	case 'R':
     		if (bean.getqItem() != null) {
-    			File file = new File(EnvConstant.LCL_STORING_PATH, bean.getqItem().getParam());
+    			File file = new File(EnvConstant.LCL_STORING_PATH, FileActionUtils.combine(bean.getqItem().getParam()));
     			if(file.exists()){
         			InputStream fis = new BufferedInputStream(new FileInputStream(file));
         			byte[] buffer = new byte[fis.available()];

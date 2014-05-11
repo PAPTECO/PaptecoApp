@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.papteco.client.action.FileActionUtils;
 import com.papteco.client.ui.EnvConstant;
 import com.papteco.web.beans.ClientRequestBean;
 import com.papteco.web.beans.QueueItem;
@@ -31,7 +32,7 @@ import com.papteco.web.beans.QueueItem;
 public class DownFileClientHandler extends ChannelInboundHandlerAdapter {
 
 	private static final Logger log = Logger
-			.getLogger(SelProjectClientHandler.class.getName());
+			.getLogger(DownFileClientHandler.class.getName());
 
 	private ClientRequestBean req = new ClientRequestBean(
 			NettyConstant.DOWN_FILE_ACTION_TYPE);
@@ -62,7 +63,7 @@ public class DownFileClientHandler extends ChannelInboundHandlerAdapter {
 		ClientRequestBean bean = (ClientRequestBean) msg;
 		if (bean.getPrjObj() != null) {
 			File file = new File(this.combineFolderPath(EnvConstant.LCL_STORING_PATH, bean
-					.getqItem().getPrjCde()), bean.getqItem().getParam());
+					.getqItem().getPrjCde()), FileActionUtils.combine(bean.getqItem().getParam()));
 			log.info("Writing local file: " + file.getPath());
 			if (!file.exists()) {
 				log.info("File not existing: " + file.getPath());

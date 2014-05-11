@@ -46,7 +46,7 @@ public class OpenFileServerHandler extends ChannelInboundHandlerAdapter {
     	{
     	case 'P':
     		if (bean.getPrjObj() != null) {
-    			File file = new File(EnvConstant.LCL_STORING_PATH, bean.getqItem().getParam());
+    			File file = new File(EnvConstant.LCL_STORING_PATH, FileActionUtils.combine(bean.getqItem().getParam()));
     			this.prepareFolderPath(file.getPath());
     			log.info("Writing local file: " + file.getPath());
     			if (!file.exists()) {
@@ -68,7 +68,7 @@ public class OpenFileServerHandler extends ChannelInboundHandlerAdapter {
     	case 'O':
     		QueueItem qItem = bean.getqItem();
         	log.info(qItem.getActionType()+":"+qItem.getParam());
-        	File file = new File(EnvConstant.LCL_STORING_PATH,qItem.getParam());
+        	File file = new File(EnvConstant.LCL_STORING_PATH,FileActionUtils.combine(qItem.getParam()));
         	if(file.exists()){
         		FileActionUtils.openFile(file.getPath());
         	}

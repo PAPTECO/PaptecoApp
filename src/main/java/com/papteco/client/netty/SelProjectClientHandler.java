@@ -89,7 +89,7 @@ public class SelProjectClientHandler extends ChannelInboundHandlerAdapter {
 				for (FileBean file : folder.getFileTree()) {
 					File f = new File(folderName, file.getFileName());
 					QueueItem q = new QueueItem("DOWNLOAD", prjCde,
-							f.getPath(), "PENDING");
+							new String[]{f.getParent(),f.getName()}, "PENDING");
 					QueueBuilder.submitSingleQueue(q);
 				}
 			} else {

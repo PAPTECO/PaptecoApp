@@ -19,6 +19,26 @@ public class FileActionUtils {
 			Runtime.getRuntime().exec("cmd /C Start \" \" \"" + file + "\"");
 		}
 	}
+	
+	public static String combine (String path1, String path2)
+	{
+	    File file1 = new File(path1);
+	    File file2 = new File(file1, path2);
+	    return file2.getPath();
+	}
+	
+	public static String combine (String[] paths)
+	{
+		
+		File f = null;
+		for(String path:paths){
+			if(f == null)
+				f = new File(path);
+			else
+				f = new File(f,path);
+		}
+		return f==null?"":f.toString();
+	}
 
 	public static String[] getLastModifiedFile(String dirPath) {
 		String[] result= null;

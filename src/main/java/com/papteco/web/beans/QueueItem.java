@@ -9,7 +9,7 @@ public class QueueItem implements Serializable {
 	private static final long serialVersionUID = 2260222960404463556L;
 	private String actionType;
 	private String prjCde;
-	private String param;
+	private String[] param;
 	private String status;
 	
 	private String additional1;
@@ -19,7 +19,7 @@ public class QueueItem implements Serializable {
 	private String additional5;
 	public QueueItem(){}
 	
-	public QueueItem(String actionType, String prjCde, String param, String status){
+	public QueueItem(String actionType, String prjCde, String[] param, String status){
 		this.actionType = actionType;
 		this.prjCde = prjCde;
 		this.param = param;
@@ -40,10 +40,10 @@ public class QueueItem implements Serializable {
 		this.prjCde = prjCde;
 	}
 
-	public String getParam() {
+	public String[] getParam() {
 		return param;
 	}
-	public void setParam(String param) {
+	public void setParam(String[] param) {
 		this.param = param;
 	}
 	public String getStatus() {
