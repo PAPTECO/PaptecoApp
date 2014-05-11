@@ -44,7 +44,7 @@
 	<!-- 错误级别日志文件设置 这个错误日志只记录error级别以上的信息，大小自定义，超过则或者再生成一份或者追加覆盖，不备份 -->
 	<!-- RollingFileAppender继承了FileAppender -->
 	<appender name="errorRollingFileAppender" class="org.apache.log4j.RollingFileAppender">
-		<param name="File" value="client_error.log" />
+		<param name="File" value="ClientError.log" />
 		<param name="Append" value="true" />
 		<param name="Threshold" value="ERROR" />
 		<param name="MaxFileSize" value="1000KB" />
@@ -60,7 +60,8 @@
 	<!-- '.'yyyy-MM-dd-HH: 每小时 -->
 	<!-- '.'yyyy-MM-dd-HH-mm: 每分钟 -->
 	<appender name="dailyRollingFileAppender" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="File" value="client_sysout.log" />
+		<param name="File" value="ClientSystemOut.log" />
+		<param name="Threshold" value="INFO" />
 		<param name="DatePattern" value="'.'yyyy-MM-dd'.log'" />
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d %-5p %l - %m%n" />
