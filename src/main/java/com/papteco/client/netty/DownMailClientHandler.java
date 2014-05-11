@@ -21,15 +21,15 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.apache.log4j.Logger;
 
 import com.papteco.client.ui.EnvConstant;
 import com.papteco.web.beans.ClientRequestBean;
 
 public class DownMailClientHandler extends ChannelInboundHandlerAdapter {
 
-	private static final Logger log = Logger
+	private static final Logger logger = Logger
 			.getLogger(SelProjectClientHandler.class.getName());
 
 	private ClientRequestBean req = new ClientRequestBean(
@@ -52,7 +52,7 @@ public class DownMailClientHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		// TODO Auto-generated method stub
-		log.info("Download Handler Stop!");
+		logger.info("Download Handler Stop!");
 	}
 
 	@Override
@@ -61,10 +61,12 @@ public class DownMailClientHandler extends ChannelInboundHandlerAdapter {
 		// Echo back the received object to the server.
 		ClientRequestBean bean = (ClientRequestBean) msg;
 		if (bean.getPrjObj() != null) {
-			File file = new File(this.combineFolderPath(EnvConstant.LCL_STORING_PATH, "MAILS_BACKUP"), bean.getAdditional1());
-			log.info("Writing local file: " + file.getPath());
+			File file = new File(this.combineFolderPath(
+					EnvConstant.LCL_STORING_PATH, "MAILS_BACKUP"),
+					bean.getAdditional1());
+			logger.info("Writing local file: " + file.getPath());
 			if (!file.exists()) {
-				log.info("File not existing: " + file.getPath());
+				logger.info("File not existing: " + file.getPath());
 			}
 			byte[] buffer = (byte[]) bean.getPrjObj();
 			BufferedOutputStream buff = null;
@@ -73,7 +75,7 @@ public class DownMailClientHandler extends ChannelInboundHandlerAdapter {
 			buff.flush();
 			buff.close();
 		} else {
-			log.info("Cannot find the specific file.");
+			logger.info("Cannot find the specific file.");
 		}
 		ctx.close();
 	}
@@ -81,8 +83,7 @@ public class DownMailClientHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
 			throws Exception {
-		log.log(Level.WARNING, "Unexpected exception from downstream.",
-				cause);
+		logger.info("Unexpected exception from downstream.");
 		ctx.close();
 	}
 

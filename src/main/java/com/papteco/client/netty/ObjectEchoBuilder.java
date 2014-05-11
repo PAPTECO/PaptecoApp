@@ -27,24 +27,24 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 import com.papteco.client.ui.SharedBoard;
 import com.papteco.web.beans.QueueItem;
 
-public class ObjectEchoBuilder extends BasicBuilder{
+public class ObjectEchoBuilder extends BasicBuilder {
 
 	private String inPrjCde;
 	private QueueItem qItem = new QueueItem();
 	private String username;
 	private String mailfile;
 
-	public ObjectEchoBuilder(){
+	public ObjectEchoBuilder() {
 	}
-	
+
 	public ObjectEchoBuilder(String inPrjCde) {
 		this.inPrjCde = inPrjCde;
 	}
-	
+
 	public ObjectEchoBuilder(String username, String flag) {
 		this.username = username;
 	}
-	
+
 	public ObjectEchoBuilder(String username, String mailfile, String flag) {
 		this.username = username;
 		this.mailfile = mailfile;
@@ -70,12 +70,14 @@ public class ObjectEchoBuilder extends BasicBuilder{
 									new InitinalClientHandler(username));
 						}
 					});
-			b.connect(envsetting.getProperty("pims_ip"), PortTranslater(envsetting.getProperty("comm_nett_port"))).sync().channel().closeFuture().sync();
+			b.connect(envsetting.getProperty("pims_ip"),
+					PortTranslater(envsetting.getProperty("comm_nett_port")))
+					.sync().channel().closeFuture().sync();
 		} finally {
 			group.shutdownGracefully();
 		}
 	}
-	
+
 	public void runSelProjectEcho() throws InterruptedException {
 		EventLoopGroup group = new NioEventLoopGroup();
 		try {
@@ -89,10 +91,13 @@ public class ObjectEchoBuilder extends BasicBuilder{
 									new ObjectEncoder(),
 									new NewObjectDecoder(ClassResolvers
 											.cacheDisabled(null)),
-									new SelProjectClientHandler(inPrjCde, SharedBoard.LOGIN_USER));
+									new SelProjectClientHandler(inPrjCde,
+											SharedBoard.LOGIN_USER));
 						}
 					});
-			b.connect(envsetting.getProperty("pims_ip"), PortTranslater(envsetting.getProperty("comm_nett_port"))).sync().channel().closeFuture().sync();
+			b.connect(envsetting.getProperty("pims_ip"),
+					PortTranslater(envsetting.getProperty("comm_nett_port")))
+					.sync().channel().closeFuture().sync();
 		} finally {
 			group.shutdownGracefully();
 		}
@@ -114,14 +119,16 @@ public class ObjectEchoBuilder extends BasicBuilder{
 									new DownFileClientHandler(qItem));
 						}
 					});
-			b.connect(envsetting.getProperty("pims_ip"), PortTranslater(envsetting.getProperty("comm_nett_port"))).sync().channel().closeFuture().sync();
-		} catch(Throwable e){
+			b.connect(envsetting.getProperty("pims_ip"),
+					PortTranslater(envsetting.getProperty("comm_nett_port")))
+					.sync().channel().closeFuture().sync();
+		} catch (Throwable e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			group.shutdownGracefully();
 		}
 	}
-	
+
 	public void getMailsList() throws Exception {
 		EventLoopGroup group = new NioEventLoopGroup();
 		try {
@@ -138,12 +145,14 @@ public class ObjectEchoBuilder extends BasicBuilder{
 									new LoadMailslistClientHandler(username));
 						}
 					});
-			b.connect(envsetting.getProperty("pims_ip"), PortTranslater(envsetting.getProperty("comm_nett_port"))).sync().channel().closeFuture().sync();
+			b.connect(envsetting.getProperty("pims_ip"),
+					PortTranslater(envsetting.getProperty("comm_nett_port")))
+					.sync().channel().closeFuture().sync();
 		} finally {
 			group.shutdownGracefully();
 		}
 	}
-	
+
 	public void downMailFile() throws Exception {
 		EventLoopGroup group = new NioEventLoopGroup();
 		try {
@@ -157,10 +166,13 @@ public class ObjectEchoBuilder extends BasicBuilder{
 									new ObjectEncoder(),
 									new NewObjectDecoder(ClassResolvers
 											.cacheDisabled(null)),
-									new DownMailClientHandler(username, mailfile));
+									new DownMailClientHandler(username,
+											mailfile));
 						}
 					});
-			b.connect(envsetting.getProperty("pims_ip"), PortTranslater(envsetting.getProperty("comm_nett_port"))).sync().channel().closeFuture().sync();
+			b.connect(envsetting.getProperty("pims_ip"),
+					PortTranslater(envsetting.getProperty("comm_nett_port")))
+					.sync().channel().closeFuture().sync();
 		} finally {
 			group.shutdownGracefully();
 		}

@@ -19,8 +19,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.apache.log4j.Logger;
 
 import com.papteco.client.ui.SharedBoard;
 import com.papteco.web.beans.UsersFormBean;
@@ -36,15 +36,17 @@ public class LoginClientHandler extends ChannelInboundHandlerAdapter {
 
 	/**
 	 * Creates a client-side handler.
-	 * @throws UnknownHostException 
+	 * 
+	 * @throws UnknownHostException
 	 */
-	public LoginClientHandler(String username, String password) throws UnknownHostException {
+	public LoginClientHandler(String username, String password)
+			throws UnknownHostException {
 		this.username = username;
 		this.password = password;
 		user = new UsersFormBean();
 		user.setCreateUserName(username);
 		user.setCreatePassword(password);
-		
+
 	}
 
 	@Override
@@ -63,7 +65,7 @@ public class LoginClientHandler extends ChannelInboundHandlerAdapter {
 			throws Exception {
 		// Echo back the received object to the server.
 		SharedBoard.loginStatus = (String) msg;
-		if(SharedBoard.loginStatus.equals("SUCC")){
+		if (SharedBoard.loginStatus.equals("SUCC")) {
 			SharedBoard.LOGIN_USER = username;
 		}
 		ctx.close();
@@ -72,8 +74,7 @@ public class LoginClientHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
 			throws Exception {
-		logger.log(Level.WARNING, "Unexpected exception from downstream.",
-				cause);
+		logger.info("Unexpected exception from downstream.");
 		ctx.close();
 	}
 }

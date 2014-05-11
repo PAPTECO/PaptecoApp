@@ -19,10 +19,9 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 
 import com.papteco.client.action.JPromptWindow;
 import com.papteco.client.bqueue.QueueBuilder;
@@ -35,12 +34,13 @@ import com.papteco.web.beans.QueueItem;
 
 public class SelProjectClientHandler extends ChannelInboundHandlerAdapter {
 
-	private static final Logger log = Logger
+	private static final Logger logger = Logger
 			.getLogger(SelProjectClientHandler.class.getName());
 
 	private ClientRequestBean req = new ClientRequestBean(
 			NettyConstant.SEL_PROJECT_ACTION_TYPE);
 	private String prjCde;
+
 	/**
 	 * Creates a client-side handler.
 	 */
@@ -59,7 +59,7 @@ public class SelProjectClientHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		// TODO Auto-generated method stub
-		log.info("Project Search Disconnected!");
+		logger.info("Project Search Disconnected!");
 	}
 
 	@Override
@@ -73,7 +73,7 @@ public class SelProjectClientHandler extends ChannelInboundHandlerAdapter {
 			this.submitFileJobsToQueue(prj);
 			JPromptWindow.showInfoMsg("Request Complete !");
 		} else {
-			if(bean.getReqUser() == null)
+			if (bean.getReqUser() == null)
 				JPromptWindow.showWarnMsg("Cannot find the user.");
 			else
 				JPromptWindow.showWarnMsg("Cannot find the specific project.");
@@ -89,29 +89,31 @@ public class SelProjectClientHandler extends ChannelInboundHandlerAdapter {
 				for (FileBean file : folder.getFileTree()) {
 					File f = new File(folderName, file.getFileName());
 					QueueItem q = new QueueItem("DOWNLOAD", prjCde,
-							new String[]{f.getParent(),f.getName()}, "PENDING");
+							new String[] { f.getParent(), f.getName() },
+							"PENDING");
 					QueueBuilder.submitSingleQueue(q);
 				}
 			} else {
-				log.info("No Files in folder ["
-						+ folder.getFolderName() + "]");
+				logger.info("No Files in folder [" + folder.getFolderName()
+						+ "]");
 			}
 
 		}
 	}
 
 	private void prepareLocalFolders(ProjectBean project) {
-		File projectFolder = new File(EnvConstant.LCL_STORING_PATH, project.getProjectCde());
+		File projectFolder = new File(EnvConstant.LCL_STORING_PATH,
+				project.getProjectCde());
 		if (!projectFolder.exists()) {
 			projectFolder.mkdirs();
 			projectFolder.setExecutable(true, false);
 			projectFolder.setReadable(true, false);
 			projectFolder.setWritable(true, false);
-			log.info("Folder \"" + projectFolder.getName()
-					+ "\" created!");
+			// logger.info("Folder \"" + projectFolder.getName()
+			// + "\" created!");
 		} else {
-			log.info("Folder \"" + projectFolder.getName()
-					+ "\" existing already!");
+			// logger.info("Folder \"" + projectFolder.getName()
+			// + "\" existing already!");
 		}
 
 		for (FolderBean folder : project.getFolderTree()) {
@@ -121,25 +123,24 @@ public class SelProjectClientHandler extends ChannelInboundHandlerAdapter {
 				sf.setExecutable(true, false);
 				sf.setReadable(true, false);
 				sf.setWritable(true, false);
-				log.info("(execable, readable, writeable) - ("
-						+ sf.canExecute() + ", " + sf.canRead() + ", "
-						+ sf.canWrite() + ") - " + projectFolder.getPath()
-						+ "/" + folder.getFolderName());
+				// logger.info("(execable, readable, writeable) - ("
+				// + sf.canExecute() + ", " + sf.canRead() + ", "
+				// + sf.canWrite() + ") - " + projectFolder.getPath()
+				// + "/" + folder.getFolderName());
 			} else {
-				log.info("(execable, readable, writeable) - ("
-						+ sf.canExecute() + ", " + sf.canRead() + ", "
-						+ sf.canWrite() + ") - " + projectFolder.getPath()
-						+ "/" + folder.getFolderName() + " [existing already]");
+				// logger.info("(execable, readable, writeable) - ("
+				// + sf.canExecute() + ", " + sf.canRead() + ", "
+				// + sf.canWrite() + ") - " + projectFolder.getPath()
+				// + "/" + folder.getFolderName() + " [existing already]");
 			}
 		}
-		log.info("Folders creation finish.");
+		logger.info("Folders creation finish.");
 	}
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
 			throws Exception {
-		log.log(Level.WARNING, "Unexpected exception from downstream.",
-				cause);
+		logger.info("Unexpected exception from downstream.");
 		ctx.close();
 	}
 }

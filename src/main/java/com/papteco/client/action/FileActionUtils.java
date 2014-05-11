@@ -9,7 +9,9 @@ import org.apache.log4j.Logger;
 
 public class FileActionUtils {
 
-	protected static final Logger log = Logger.getLogger(FileActionUtils.class); 
+	protected static final Logger log = Logger.getLogger(FileActionUtils.class
+			.getName());
+
 	public static void openFile(String file) throws IOException {
 		log.info(System.getProperty("os.name"));
 		if (System.getProperty("os.name").startsWith("Mac")) {
@@ -19,49 +21,48 @@ public class FileActionUtils {
 			Runtime.getRuntime().exec("cmd /C Start \" \" \"" + file + "\"");
 		}
 	}
-	
-	public static String combine (String path1, String path2)
-	{
-	    File file1 = new File(path1);
-	    File file2 = new File(file1, path2);
-	    return file2.getPath();
+
+	public static String combine(String path1, String path2) {
+		File file1 = new File(path1);
+		File file2 = new File(file1, path2);
+		return file2.getPath();
 	}
-	
-	public static String combine (String[] paths)
-	{
-		
+
+	public static String combine(String[] paths) {
+
 		File f = null;
-		for(String path:paths){
-			if(f == null)
+		for (String path : paths) {
+			if (f == null)
 				f = new File(path);
 			else
-				f = new File(f,path);
+				f = new File(f, path);
 		}
-		return f==null?"":f.toString();
+		return f == null ? "" : f.toString();
 	}
 
 	public static String[] getLastModifiedFile(String dirPath) {
-		String[] result= null;
+		String[] result = null;
 		File dir = new File(dirPath);
-		if(!dir.exists())
+		if (!dir.exists())
 			dir.mkdir();
 		File[] files = dir.listFiles();
-		if(files != null && files.length > 0){
+		if (files != null && files.length > 0) {
 			result = new String[3];
 			Arrays.sort(files, new LastModifiedFileComparator());
 			for (int i = 0; i < files.length; i++) {
 				File file = files[i];
-				if(file.isFile()){
+				if (file.isFile()) {
 					result[0] = file.getPath();
 					result[1] = String.valueOf(file.lastModified());
-					result[2] = file.getName().contains(".")?file.getName().substring(file.getName().lastIndexOf(".")):"";
+					result[2] = file.getName().contains(".") ? file.getName()
+							.substring(file.getName().lastIndexOf(".")) : "";
 					break;
 				}
 			}
 		}
 		return result;
 	}
-	
+
 	public static void main(String[] args) throws Exception {
 		FileActionUtils.getLastModifiedFile("C:\\Users\\Cony\\git\\papteco");
 	}

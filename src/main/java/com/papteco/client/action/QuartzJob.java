@@ -13,9 +13,10 @@ import com.papteco.client.ui.EnvConstant;
 
 public class QuartzJob implements Job {
 
-	protected static final Logger log = Logger.getLogger(QuartzJob.class); 
-	public QuartzJob() {
+	protected static final Logger logger = Logger.getLogger(QuartzJob.class
+			.getName());
 
+	public QuartzJob() {
 	}
 
 	public QuartzJob(String username) {
@@ -24,17 +25,19 @@ public class QuartzJob implements Job {
 	public void execute(JobExecutionContext arg0) throws JobExecutionException {
 		// TODO Auto-generated method stub
 		try {
-			if(StringUtils.isNotEmpty(EnvConstant.LCL_MAILFILE_PATH) && new File(EnvConstant.LCL_MAILFILE_PATH).exists()){
-//				System.out.println("Uploading Mail File.");
+			if (StringUtils.isNotEmpty(EnvConstant.LCL_MAILFILE_PATH)
+					&& new File(EnvConstant.LCL_MAILFILE_PATH).exists()) {
+				// System.out.println("Uploading Mail File.");
 				new QuartzMailBackupBuilder().runMailBackup();
-			}else{
-//				log.info("Mail-File Path is invalid!");
+			} else {
+				// log.info("Mail-File Path is invalid!");
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		};
-		
+		}
+		;
+
 	}
 
 }

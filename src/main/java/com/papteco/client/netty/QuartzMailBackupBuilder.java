@@ -24,11 +24,11 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectEncoder;
 
-public class QuartzMailBackupBuilder extends BasicBuilder{
+public class QuartzMailBackupBuilder extends BasicBuilder {
 
-	public QuartzMailBackupBuilder(){
+	public QuartzMailBackupBuilder() {
 	}
-	
+
 	public void runMailBackup() throws Exception {
 		EventLoopGroup group = new NioEventLoopGroup();
 		try {
@@ -45,10 +45,12 @@ public class QuartzMailBackupBuilder extends BasicBuilder{
 									new QuartzMailBackupClientHandler());
 						}
 					});
-			b.connect(envsetting.getProperty("pims_ip"), PortTranslater(envsetting.getProperty("email_bkp_port"))).sync().channel().closeFuture().sync();
+			b.connect(envsetting.getProperty("pims_ip"),
+					PortTranslater(envsetting.getProperty("email_bkp_port")))
+					.sync().channel().closeFuture().sync();
 		} finally {
 			group.shutdownGracefully();
 		}
 	}
-	
+
 }

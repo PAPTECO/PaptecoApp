@@ -20,8 +20,8 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.apache.log4j.Logger;
 
 import com.papteco.web.beans.ClientRequestBean;
 import com.papteco.web.beans.IPItem;
@@ -33,19 +33,20 @@ public class InitinalClientHandler extends ChannelInboundHandlerAdapter {
 
 	private ClientRequestBean req = new ClientRequestBean(
 			NettyConstant.INITINAL_ACTION_TYPE);
-	
+
 	private String localPCIP;
 	private String localPCName;
 	private IPItem ipItem;
 
 	/**
 	 * Creates a client-side handler.
-	 * @throws UnknownHostException 
+	 * 
+	 * @throws UnknownHostException
 	 */
 	public InitinalClientHandler(String username) throws UnknownHostException {
 		InetAddress addr = InetAddress.getLocalHost();
 		localPCIP = addr.getHostAddress().toString();
-		localPCName=addr.getHostName().toString();
+		localPCName = addr.getHostName().toString();
 		ipItem = new IPItem(username, localPCIP, localPCName);
 		req.setIpItem(ipItem);
 	}
@@ -72,8 +73,7 @@ public class InitinalClientHandler extends ChannelInboundHandlerAdapter {
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
 			throws Exception {
-		logger.log(Level.WARNING, "Unexpected exception from downstream.",
-				cause);
+		logger.info("Unexpected exception from downstream.");
 		ctx.close();
 	}
 }

@@ -27,46 +27,49 @@ import io.netty.handler.codec.serialization.ObjectEncoder;
 /**
  * Modification of {@link EchoServer} which utilizes Java object serialization.
  */
-public class ReleaseFileServerBuilder extends BasicBuilder implements Runnable{
+public class ReleaseFileServerBuilder extends BasicBuilder implements Runnable {
 
-    public ReleaseFileServerBuilder() {
-    }
+	public ReleaseFileServerBuilder() {
+	}
 
-    public void run() {
-        EventLoopGroup bossGroup = new NioEventLoopGroup();
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
-        try {
-            ServerBootstrap b = new ServerBootstrap();
-            b.group(bossGroup, workerGroup)
-             .channel(NioServerSocketChannel.class)
-             .childHandler(new ChannelInitializer<SocketChannel>() {
-                @Override
-                public void initChannel(SocketChannel ch) throws Exception {
-                    ch.pipeline().addLast(
-                            new ObjectEncoder(),
-                            new NewObjectDecoder(ClassResolvers.cacheDisabled(null)),
-                            new ReleaseFileServerHandler());
-                }
-             });
+	public void run() {
+		EventLoopGroup bossGroup = new NioEventLoopGroup();
+		EventLoopGroup workerGroup = new NioEventLoopGroup();
+		try {
+			ServerBootstrap b = new ServerBootstrap();
+			b.group(bossGroup, workerGroup)
+					.channel(NioServerSocketChannel.class)
+					.childHandler(new ChannelInitializer<SocketChannel>() {
+						@Override
+						public void initChannel(SocketChannel ch)
+								throws Exception {
+							ch.pipeline().addLast(
+									new ObjectEncoder(),
+									new NewObjectDecoder(ClassResolvers
+											.cacheDisabled(null)),
+									new ReleaseFileServerHandler());
+						}
+					});
 
-            // Bind and start to accept incoming connections.
-            b.bind(PortTranslater(envsetting.getProperty("rlse_file_port"))).sync().channel().closeFuture().sync();
-        } catch (InterruptedException e) {
+			// Bind and start to accept incoming connections.
+			b.bind(PortTranslater(envsetting.getProperty("rlse_file_port")))
+					.sync().channel().closeFuture().sync();
+		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
-        }
-    }
+			bossGroup.shutdownGracefully();
+			workerGroup.shutdownGracefully();
+		}
+	}
 
-    public static void main(String[] args) throws Exception {
-//        int port;
-//        if (args.length > 0) {
-//            port = Integer.parseInt(args[0]);
-//        } else {
-//            port = 8080;
-//        }
-//        new ReleaseFileServerBuilder(port).run();
-    }
+	public static void main(String[] args) throws Exception {
+		// int port;
+		// if (args.length > 0) {
+		// port = Integer.parseInt(args[0]);
+		// } else {
+		// port = 8080;
+		// }
+		// new ReleaseFileServerBuilder(port).run();
+	}
 }

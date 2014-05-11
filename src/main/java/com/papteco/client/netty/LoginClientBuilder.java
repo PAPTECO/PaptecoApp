@@ -29,9 +29,9 @@ public class LoginClientBuilder extends BasicBuilder {
 	private String username;
 	private String password;
 
-	public LoginClientBuilder(){
+	public LoginClientBuilder() {
 	}
-	
+
 	public LoginClientBuilder(String username, String password) {
 		this.username = username;
 		this.password = password;
@@ -53,10 +53,12 @@ public class LoginClientBuilder extends BasicBuilder {
 									new LoginClientHandler(username, password));
 						}
 					});
-			b.connect(envsetting.getProperty("pims_ip"), PortTranslater(envsetting.getProperty("login_sym_port"))).sync().channel().closeFuture().sync();
+			b.connect(envsetting.getProperty("pims_ip"),
+					PortTranslater(envsetting.getProperty("login_sym_port")))
+					.sync().channel().closeFuture().sync();
 		} finally {
 			group.shutdownGracefully();
 		}
 	}
-	
+
 }

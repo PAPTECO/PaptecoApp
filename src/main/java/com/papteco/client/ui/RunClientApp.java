@@ -36,7 +36,6 @@ import javax.swing.JPasswordField;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -60,13 +59,14 @@ import com.papteco.client.netty.ObjectEchoBuilder;
 import com.papteco.client.netty.OpenFileServerBuilder;
 import com.papteco.client.netty.ReleaseFileServerBuilder;
 
-public class RunClientApp extends JFrame implements ChangeListener{
+public class RunClientApp extends JFrame implements ChangeListener {
 
 	/**
      * 
      */
 	private static final long serialVersionUID = -2435953743688848219L;
-	protected static final Logger log = Logger.getLogger(RunClientApp.class); 
+	protected static final Logger logger = Logger.getLogger(RunClientApp.class
+			.getName());
 	protected Properties envsetting = EnvConfiguration.getEnvSetting();
 	private static RunClientApp frame;
 
@@ -189,7 +189,7 @@ public class RunClientApp extends JFrame implements ChangeListener{
 				}
 			}
 		});
-		tabpanel.add("ProjectSetup",mainpanel);
+		tabpanel.add("ProjectSetup", mainpanel);
 	}
 
 	protected void drawMailPanel() throws IOException {
@@ -237,11 +237,12 @@ public class RunClientApp extends JFrame implements ChangeListener{
 		mailsloadbtn = new JButton("Load");
 		mailsloadbtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+
 				try {
 					mailslist.removeAllItems();
-					new ObjectEchoBuilder(SharedBoard.LOGIN_USER, "").getMailsList();
-					for(String item : SharedBoard.MAILS_LIST){
+					new ObjectEchoBuilder(SharedBoard.LOGIN_USER, "")
+							.getMailsList();
+					for (String item : SharedBoard.MAILS_LIST) {
 						mailslist.addItem(item);
 					}
 					mailslist.setEnabled(true);
@@ -249,31 +250,35 @@ public class RunClientApp extends JFrame implements ChangeListener{
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				
+
 			}
 		});
 		maillistpanel.add(mailslist);
 		maillistpanel.add(mailsloadbtn);
-		
+
 		mailsdownbtn = new JButton("Download Mail File");
 		mailsdownbtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
+
 				try {
-					if(StringUtils.isNotEmpty(lclPath.getText())&&StringUtils.isNotEmpty(mailslist.getSelectedItem().toString())){
-						new ObjectEchoBuilder(SharedBoard.LOGIN_USER,mailslist.getSelectedItem().toString(), "").downMailFile();
-					}else{
+					if (StringUtils.isNotEmpty(lclPath.getText())
+							&& StringUtils.isNotEmpty(mailslist
+									.getSelectedItem().toString())) {
+						new ObjectEchoBuilder(SharedBoard.LOGIN_USER, mailslist
+								.getSelectedItem().toString(), "")
+								.downMailFile();
+					} else {
 						JPromptWindow
-						.showWarnMsg("Please input your project storing path and choose one mail_backup file!");
+								.showWarnMsg("Please input your project storing path and choose one mail_backup file!");
 					}
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
-				
+
 			}
 		});
-		
+
 		mailpanel.add(lclMailPath_l);
 		mailpanel.add(lclmailpanel);
 		mailpanel.add(mailslist_l);
@@ -281,7 +286,7 @@ public class RunClientApp extends JFrame implements ChangeListener{
 		mailpanel.add(mailsdownbtn);
 		tabpanel.add("MailSetup", mailpanel);
 	}
-	
+
 	public RunClientApp() throws Exception {
 		card = new CardLayout(5, 5);
 		basicpanel = new JPanel(card);
@@ -320,7 +325,7 @@ public class RunClientApp extends JFrame implements ChangeListener{
 						new LoginClientBuilder(username.getText(), String
 								.valueOf(password.getPassword()))
 								.validateUser();
-						log.info(SharedBoard.loginStatus);
+						logger.info(SharedBoard.loginStatus);
 						if (SharedBoard.loginStatus.equals("NOUSER")) {
 							JPromptWindow.showWarnMsg("No this user!");
 						} else if (SharedBoard.loginStatus.equals("PWDINC")) {
@@ -351,7 +356,6 @@ public class RunClientApp extends JFrame implements ChangeListener{
 					SystemTray systemTray = SystemTray.getSystemTray();
 					if (trayIcon != null) {
 						systemTray.remove(trayIcon);
-						log.info("trayIcon removed");
 					}
 					URL resource = this.getClass().getResource("/logo.png");
 					BufferedImage imageScaled = null;
@@ -460,40 +464,40 @@ public class RunClientApp extends JFrame implements ChangeListener{
 	 */
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
-		PropertyConfigurator.configure(RunClientApp.class.getResourceAsStream("/log4j.xml"));  
-		
-		JFrame.setDefaultLookAndFeelDecorated(true);  
-		JDialog.setDefaultLookAndFeelDecorated(true); 
-//		SwingUtilities.invokeLater(new Runnable() { 
-//	           public void run() {  
-	        	   
-	                try {
-	                	UIManager.setLookAndFeel("com.jtattoo.plaf.mcwin.McWinLookAndFeel"); 
-//		                SubstanceLookAndFeel.setSkin(new BusinessBlackSteelSkin()); 
-	                	RunClientApp.makeSingle("single.test");
-	            		frame = new RunClientApp();
-	            		frame.setTitle("Papteco Client Application");
-	            		frame.setVisible(true);
-	            		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-	            		frame.setSize(winWidth, winHeight);
-	            		frame.setLocation(pointX, pointY);
-	            		/*
-	            		 * log.info(frame.getExtendedState());
-	            		 * frame.setExtendedState(Frame.MAXIMIZED_BOTH);
-	            		 */
-	  
-	                } catch (Exception e) {  
-	                    e.printStackTrace();  
-	                }  
-//	            }  
-//	        }); 
+		PropertyConfigurator.configure(RunClientApp.class
+				.getResourceAsStream("/log4j.xml"));
 
+		JFrame.setDefaultLookAndFeelDecorated(true);
+		JDialog.setDefaultLookAndFeelDecorated(true);
+		// SwingUtilities.invokeLater(new Runnable() {
+		// public void run() {
+
+		try {
+			UIManager.setLookAndFeel("com.jtattoo.plaf.mcwin.McWinLookAndFeel");
+			// SubstanceLookAndFeel.setSkin(new BusinessBlackSteelSkin());
+			RunClientApp.makeSingle("single.test");
+			frame = new RunClientApp();
+			frame.setTitle("Papteco Client Application");
+			frame.setVisible(true);
+			frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+			frame.setSize(winWidth, winHeight);
+			frame.setLocation(pointX, pointY);
+			/*
+			 * log.info(frame.getExtendedState());
+			 * frame.setExtendedState(Frame.MAXIMIZED_BOTH);
+			 */
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		// }
+		// });
 
 	}
 
 	public void stateChanged(ChangeEvent arg0) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

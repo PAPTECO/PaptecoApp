@@ -23,10 +23,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.UnknownHostException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 
 import com.papteco.client.action.FileActionUtils;
 import com.papteco.client.ui.EnvConstant;
@@ -39,10 +38,11 @@ public class QuartzMailBackupClientHandler extends ChannelInboundHandlerAdapter 
 
 	private ClientRequestBean req = new ClientRequestBean(
 			NettyConstant.MAILBKP_INI_ACTION_TYPE);
-	
+
 	/**
 	 * Creates a client-side handler.
-	 * @throws UnknownHostException 
+	 * 
+	 * @throws UnknownHostException
 	 */
 	public QuartzMailBackupClientHandler() throws UnknownHostException {
 		req.setReqUser(EnvConstant.LOGIN_USER);
@@ -66,34 +66,37 @@ public class QuartzMailBackupClientHandler extends ChannelInboundHandlerAdapter 
 		// Echo back the received object to the server.
 		ClientRequestBean bean = (ClientRequestBean) msg;
 		bean.setActionType(NettyConstant.MAILBKP_UP_ACTION_TYPE);
-		String[] lastMailFile = FileActionUtils.getLastModifiedFile(EnvConstant.LCL_MAILFILE_PATH);
-		if(lastMailFile != null && StringUtils.isNotEmpty(lastMailFile[1])){
-			if(bean.getTimestamp() != null && 
-					Long.valueOf(lastMailFile[1]) <= Long.valueOf(bean.getTimestamp())){
-//				System.out.println("No Mail-File's update.");
-			}else{
+		String[] lastMailFile = FileActionUtils
+				.getLastModifiedFile(EnvConstant.LCL_MAILFILE_PATH);
+		if (lastMailFile != null && StringUtils.isNotEmpty(lastMailFile[1])) {
+			if (bean.getTimestamp() != null
+					&& Long.valueOf(lastMailFile[1]) <= Long.valueOf(bean
+							.getTimestamp())) {
+				// System.out.println("No Mail-File's update.");
+			} else {
 				File file = new File(lastMailFile[0]);
-				InputStream fis = new BufferedInputStream(new FileInputStream(file));
+				InputStream fis = new BufferedInputStream(new FileInputStream(
+						file));
 				byte[] buffer = new byte[fis.available()];
-		        fis.read(buffer);
-		        fis.close();
-		        bean.setPrjObj(buffer);
-		        bean.setTimestamp(lastMailFile[1]);
-		        bean.setMailfileSuffix(lastMailFile[2]);
+				fis.read(buffer);
+				fis.close();
+				bean.setPrjObj(buffer);
+				bean.setTimestamp(lastMailFile[1]);
+				bean.setMailfileSuffix(lastMailFile[2]);
 			}
 		}
-        ctx.write(bean);
+		ctx.write(bean);
 	}
 
-    @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-        ctx.flush();
-    }
+	@Override
+	public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+		ctx.flush();
+	}
+
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
 			throws Exception {
-		logger.log(Level.WARNING, "Unexpected exception from downstream.",
-				cause);
+		logger.info("Unexpected exception from downstream.");
 		ctx.close();
 	}
 }

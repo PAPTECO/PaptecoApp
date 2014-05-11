@@ -20,8 +20,8 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.net.UnknownHostException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.apache.log4j.Logger;
 
 import com.papteco.client.ui.SharedBoard;
 import com.papteco.web.beans.ClientRequestBean;
@@ -33,13 +33,14 @@ public class LoadMailslistClientHandler extends ChannelInboundHandlerAdapter {
 
 	private ClientRequestBean req = new ClientRequestBean(
 			NettyConstant.GET_MAILS_LIST);
-	
 
 	/**
 	 * Creates a client-side handler.
-	 * @throws UnknownHostException 
+	 * 
+	 * @throws UnknownHostException
 	 */
-	public LoadMailslistClientHandler(String username) throws UnknownHostException {
+	public LoadMailslistClientHandler(String username)
+			throws UnknownHostException {
 		req.setReqUser(username);
 	}
 
@@ -59,16 +60,15 @@ public class LoadMailslistClientHandler extends ChannelInboundHandlerAdapter {
 			throws Exception {
 		// Echo back the received object to the server.
 		ClientRequestBean bean = (ClientRequestBean) msg;
-		if(bean.getAdditional6() != null)
-			SharedBoard.MAILS_LIST = (List)bean.getAdditional6();
+		if (bean.getAdditional6() != null)
+			SharedBoard.MAILS_LIST = (List) bean.getAdditional6();
 		ctx.close();
 	}
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
 			throws Exception {
-		logger.log(Level.WARNING, "Unexpected exception from downstream.",
-				cause);
+		logger.info("Unexpected exception from downstream.");
 		ctx.close();
 	}
 }

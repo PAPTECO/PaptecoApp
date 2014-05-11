@@ -22,8 +22,8 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.apache.log4j.Logger;
 
 import com.papteco.client.action.FileActionUtils;
 import com.papteco.client.ui.EnvConstant;
@@ -35,50 +35,49 @@ import com.papteco.web.beans.ClientRequestBean;
  */
 public class ReleaseFileServerHandler extends ChannelInboundHandlerAdapter {
 
-    private static final Logger log = Logger.getLogger(
-            ReleaseFileServerHandler.class.getName());
+	private static final Logger logger = Logger
+			.getLogger(ReleaseFileServerHandler.class.getName());
 
-    @Override
+	@Override
 	public void channelInactive(ChannelHandlerContext ctx) throws Exception {
 		// TODO Auto-generated method stub
 		ctx.close();
 	}
 
 	@Override
-    public void channelRead(
-            ChannelHandlerContext ctx, Object msg) throws Exception {
-    	ClientRequestBean bean = (ClientRequestBean) msg;
-    	switch (bean.getActionType())
-    	{
-    	case 'R':
-    		if (bean.getqItem() != null) {
-    			File file = new File(EnvConstant.LCL_STORING_PATH, FileActionUtils.combine(bean.getqItem().getParam()));
-    			if(file.exists()){
-        			InputStream fis = new BufferedInputStream(new FileInputStream(file));
-        			byte[] buffer = new byte[fis.available()];
-        	        fis.read(buffer);
-        	        fis.close();
-        	        bean.setPrjObj(buffer);
-        		}
-    		} else {
-    			log.info("Cannot find the specific file.");
-    		}
-    		break;
-    	}
-    	ctx.writeAndFlush(bean);
-    }
+	public void channelRead(ChannelHandlerContext ctx, Object msg)
+			throws Exception {
+		ClientRequestBean bean = (ClientRequestBean) msg;
+		switch (bean.getActionType()) {
+		case 'R':
+			if (bean.getqItem() != null) {
+				File file = new File(EnvConstant.LCL_STORING_PATH,
+						FileActionUtils.combine(bean.getqItem().getParam()));
+				if (file.exists()) {
+					InputStream fis = new BufferedInputStream(
+							new FileInputStream(file));
+					byte[] buffer = new byte[fis.available()];
+					fis.read(buffer);
+					fis.close();
+					bean.setPrjObj(buffer);
+				}
+			} else {
+				logger.info("Cannot find the specific file.");
+			}
+			break;
+		}
+		ctx.writeAndFlush(bean);
+	}
 
-    @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
-//        ctx.flush();
-    }
+	@Override
+	public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+		// ctx.flush();
+	}
 
-    @Override
-    public void exceptionCaught(
-            ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        log.log(
-                Level.WARNING,
-                "Unexpected exception from downstream.", cause);
-        ctx.close();
-    }
+	@Override
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
+			throws Exception {
+		logger.info("Unexpected exception from downstream.");
+		ctx.close();
+	}
 }
